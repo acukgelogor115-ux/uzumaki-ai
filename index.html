@@ -58,7 +58,6 @@
 
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        /* Header icon buttons */
         .icon-btn {
             width: 36px; height: 36px;
             background: rgba(255,255,255,0.05);
@@ -299,7 +298,6 @@
             display: block;
         }
 
-        /* USER — hitam glass */
         .bubble.user {
             background: rgba(255,255,255,0.06);
             color: #ddd;
@@ -308,7 +306,6 @@
             backdrop-filter: blur(12px);
         }
 
-        /* AI — sedikit lebih gelap */
         .bubble.ai {
             background: rgba(255,255,255,0.03);
             color: #ccc;
@@ -491,7 +488,7 @@
 <body>
 
 <header>
-      <div class="avatar">✨</div>
+    <div class="avatar">✨</div>
     <div class="header-info">
         <h2>Aira AI</h2>
         <p><span class="online-dot"></span>• Diciptakan oleh Manz Uzumaki</p>
@@ -513,10 +510,12 @@
 
             <div class="menu-section">🤖 Pilih AI & Versi</div>
             <div class="menu-inner">
-                <select id="aiProvider" onchange="onProviderChange()">
-                    <option value="gemini">🔵 Gemini (Google)</option>
-                    <option value="groq">⚡ Groq (Gratis & Cepat)</option>
-                </select>
+              <select id="aiProvider" onchange="onProviderChange()">
+                <option value="gemini">Milky AI</option>
+                  <option value="groq">Way AI</option>
+                    <option value="meta">Alpha AI</option>
+                  </select>
+
                 <select id="modelVersion" onchange="saveVersion()">
                     <option value="fast">🚀 Cepat — respons kilat</option>
                     <option value="deep">🧠 Mendalam — analisis detail</option>
@@ -547,14 +546,12 @@
 </div>
 
 <div class="input-container">
-    <!-- Pratinjau Gambar Sebelum Dikirim -->
     <div class="preview-area" id="previewArea">
         <img src="" id="imgPreviewTarget" alt="Upload Preview">
         <button class="preview-close" onclick="clearImageUpload()">×</button>
     </div>
 
     <div class="input-area">
-        <!-- Tombol Tanda Tambah ( + ) di sebelah kiri bawah teks ketikan -->
         <div class="action-wrapper">
             <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
             <div class="action-menu" id="actionMenu">
@@ -583,8 +580,14 @@
         },
         groq: {
             fast:  'llama-3.1-8b-instant',
-            deep:  'llama-3.3-70b-versatile',
+            deep:  'groq/compound', 
             think: 'deepseek-r1-distill-llama-70b',
+            task:  'groq/compound-mini' 
+        },
+        meta: {
+            fast:  'llama-3.3-70b-versatile',
+            deep:  'llama-3.3-70b-versatile',
+            think: 'llama-3.3-70b-versatile',
             task:  'llama-3.3-70b-versatile'
         }
     };
@@ -601,7 +604,6 @@
     let currentSessionId = localStorage.getItem('aira_active_session') || '';
     let sessions         = JSON.parse(localStorage.getItem('aira_sessions')) || [];
     
-    // Status Unggahan Gambar
     let uploadedImageBase64 = '';
     let uploadedImageMime   = '';
 
@@ -624,7 +626,6 @@
     }
     renderHistoryList();
 
-    // Event menutup menu jika klik di area luar luar
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('menuDropdown');
         const hist = document.getElementById('historyDropdown');
@@ -653,7 +654,7 @@
     }
 
     function getProviderName(p) {
-        return { gemini:'Gemini', groq:'Groq' }[p] || p;
+        return { gemini:'Gemini', groq:'Groq', meta:'Meta AI' }[p] || p;
     }
 
     function saveApiKey() {
@@ -675,7 +676,6 @@
 
     function hideBadge() { document.getElementById('apiBadge').style.display = 'none'; }
 
-    /* ── Manajemen Sesi & Chat Bekas ── */
     function getSessionById(id) {
         for (let i = 0; i < sessions.length; i++) {
             if (sessions[i].id === id) return sessions[i];
@@ -796,7 +796,6 @@
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
 
-    /* ── Penanganan & Unggah File Gambar ── */
     function triggerImageFile() {
         document.getElementById('hiddenFileInput').click();
         document.getElementById('actionMenu').classList.remove('show');
@@ -811,7 +810,6 @@
             uploadedImageBase64 = e.target.result.split(',')[1];
             uploadedImageMime   = file.type;
             
-            // Tampilkan Pratinjau
             document.getElementById('imgPreviewTarget').src = e.target.result;
             document.getElementById('previewArea').style.display = 'block';
         };
@@ -825,7 +823,6 @@
         document.getElementById('previewArea').style.display = 'none';
     }
 
-    /* ── Fitur Teks ke Foto (Text-To-Photo) ── */
     function triggerTextToPhoto() {
         document.getElementById('actionMenu').classList.remove('show');
         const promptText = prompt("Masukkan deskripsi foto (prompt) yang ingin dihasilkan:");
@@ -835,7 +832,6 @@
         const welcome  = chatArea.querySelector('.welcome');
         if (welcome) welcome.remove();
 
-        // Tampilkan permintaan user ke DOM
         const displayPrompt = "Hasilkan foto: " + promptText;
         renderBubbleDOM('user', displayPrompt, null, null);
         
@@ -844,7 +840,6 @@
 
         showTyping();
 
-        // Menggunakan mesin generator rendering instan bebas-kunci pihak ketiga
         const generatedUrl = 'https://image.pollinations.ai/p/' + encodeURIComponent(promptText.trim()) + '?width=800&height=800&nologo=true';
 
         setTimeout(function() {
@@ -860,7 +855,6 @@
         }, 1200);
     }
 
-    /* ── Render Antarmuka Bubble Percakapan ── */
     function renderBubbleDOM(role, text, imageData, generatedImageUrl) {
         const chatArea = document.getElementById('chatArea');
         const welcome  = chatArea.querySelector('.welcome');
@@ -879,14 +873,12 @@
         const bubble = document.createElement('div');
         bubble.className = 'bubble ' + role;
 
-        // Jika terdapat lampiran foto kiriman user (Vision Mode)
         if (imageData) {
             const img = document.createElement('img');
             img.src = 'data:' + imageData.mime + ';base64,' + imageData.data;
             bubble.appendChild(img);
         }
 
-        // Jika terdapat lampiran foto hasil generate (Text-to-Photo)
         if (generatedImageUrl) {
             const img = document.createElement('img');
             img.src = generatedImageUrl;
@@ -929,7 +921,6 @@
         if (el) el.remove();
     }
 
-    /* ── Alur Pengiriman & Pemrosesan Pesan ── */
     async function sendMessage() {
         if (isLoading) return;
 
@@ -945,7 +936,6 @@
         const input = document.getElementById('msgInput');
         const msg   = input.value.trim();
         
-        // Validasi agar pesan tidak kosong jika tidak ada gambar yang diunggah
         if (!msg && !uploadedImageBase64) return;
 
         input.value        = '';
@@ -958,11 +948,9 @@
 
         renderBubbleDOM('user', msg, imageObj, null);
         
-        // Simpan objek data ke riwayat internal
         chatHistory.push({ role: 'user', content: msg, image: imageObj });
         saveActiveHistoryToMemory();
 
-        // Kunci form input selama loading
         isLoading = true;
         document.getElementById('sendBtn').disabled = true;
         showTyping();
@@ -970,7 +958,6 @@
         const systemPrompt = SYSTEM_PROMPTS[version];
         const model        = MODELS[provider][version];
 
-        // Backup data gambar lokal saat ini sebelum fungsi pembersihan dipanggil
         const processingImage = imageObj;
         clearImageUpload();
 
@@ -978,11 +965,16 @@
             let reply = '';
             if (provider === 'gemini') {
                 reply = await callGemini(apiKey, model, systemPrompt);
-            } else {
+            } else if (provider === 'groq') {
                 if (processingImage) {
-                    throw new Error("Model Groq saat ini belum dioptimalkan untuk memproses input gambar. Silakan beralih ke penyedia Gemini di opsi menu pengaturan.");
+                    throw new Error("Model Groq saat ini belum dioptimalkan untuk memproses input gambar langsung secara client-side. Silakan gunakan penyedia Gemini untuk Vision Mode.");
                 }
                 reply = await callGroq(apiKey, model, systemPrompt);
+            } else if (provider === 'meta') {
+                if (processingImage) {
+                    throw new Error("Model Meta AI saat ini belum dioptimalkan untuk memproses input gambar langsung secara client-side. Silakan gunakan penyedia Gemini untuk Vision Mode.");
+                }
+                reply = await callMeta(apiKey, model, systemPrompt);
             }
             removeTyping();
             renderBubbleDOM('ai', reply, null, null);
@@ -997,9 +989,7 @@
         }
     }
 
-    /* ── Pemanggilan API Core ── */
     async function callGemini(apiKey, model, systemPrompt) {
-        // Pemetaan struktur riwayat pesan agar sesuai dengan spesifikasi Gemini API
         const contents = chatHistory.map(function(m) {
             let parts = [];
             if (m.image) {
@@ -1022,7 +1012,6 @@
                 body: JSON.stringify({
                     system_instruction: { parts: [{ text: systemPrompt }] },
                     contents: contents,
-                    // Mengaktifkan fitur pencarian Google Search Grounding secara real-time
                     tools: [{ google_search: {} }]
                 })
             }
@@ -1043,7 +1032,6 @@
     }
 
     async function callGroq(apiKey, model, systemPrompt) {
-        // Filter out any entries that might contain image payloads for standard text model Groq
         const textOnlyHistory = chatHistory.map(function(m) {
             return { role: m.role, content: m.content };
         });
@@ -1062,6 +1050,32 @@
 
         const data = await res.json();
         if (!res.ok) throw new Error((data.error && data.error.message) || 'Groq error ' + res.status);
+        
+        if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
+        return 'Maaf, Aira tidak menerima respon balik dari server.';
+    }
+
+    async function callMeta(apiKey, model, systemPrompt) {
+        const textOnlyHistory = chatHistory.map(function(m) {
+            return { role: m.role, content: m.content };
+        });
+
+        const messages = [{ role: 'system', content: systemPrompt }].concat(textOnlyHistory);
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+            body: JSON.stringify({ model: model, messages: messages })
+        });
+        
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server API Meta AI mengirimkan respons tidak valid. Status: " + res.status);
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error((data.error && data.error.message) || 'Meta AI error ' + res.status);
         
         if (data && data.choices && data.choices[0] && data.choices[0].message) {
             return data.choices[0].message.content;
