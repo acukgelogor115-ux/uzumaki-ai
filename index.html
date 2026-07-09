@@ -1,4 +1,4 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -80,10 +80,10 @@ DOCTYPE html>
             color: #ff6b00;
         }
 
-        /* ── Menu ── */
-        .menu-container { position: relative; }
+        /* ── Menu & History Containers ── */
+        .menu-container, .history-container { position: relative; }
 
-        .menu-dropdown {
+        .menu-dropdown, .history-dropdown {
             display: none;
             position: absolute;
             top: 44px;
@@ -98,7 +98,13 @@ DOCTYPE html>
             z-index: 100;
         }
 
-        .menu-dropdown.show {
+        .history-dropdown {
+            max-height: 320px;
+            overflow-y: auto;
+            min-width: 280px;
+        }
+
+        .menu-dropdown.show, .history-dropdown.show {
             display: block;
             animation: fadeDown 0.2s ease;
         }
@@ -173,6 +179,60 @@ DOCTYPE html>
         .api-badge.ok  { background:rgba(0,230,118,.07); border:1px solid rgba(0,230,118,.15); color:#00e676; }
         .api-badge.err { background:rgba(255,82,82,.07);  border:1px solid rgba(255,82,82,.15);  color:#ff5252; }
 
+        /* ── History List Style ── */
+        .history-list {
+            padding: 6px 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.09);
+        }
+
+        .history-item.active {
+            background: rgba(255,107,0,0.08);
+            border-color: rgba(255,107,0,0.25);
+        }
+
+        .history-text {
+            color: #ddd;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .history-del {
+            background: none;
+            border: none;
+            color: #ff5252;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 6px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .history-del:hover { opacity: 1; }
+        .no-history { text-align: center; color: #444; font-size: 12px; padding: 20px 0; }
+
         /* ── Chat area ── */
         .chat-area {
             flex: 1;
@@ -191,7 +251,6 @@ DOCTYPE html>
             margin: auto;
             padding: 30px 20px;
         }
-                }
 
         .welcome .logo {
             font-size: 52px;
@@ -342,6 +401,15 @@ DOCTYPE html>
     <!-- Tombol percakapan baru -->
     <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">✏️</button>
 
+    <!-- Tombol Chat Bekas / Riwayat -->
+    <div class="history-container">
+        <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">🕒</button>
+        <div class="history-dropdown" id="historyDropdown">
+            <div class="menu-section">🕒 Chat Bekas</div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
     <!-- Menu titik tiga -->
     <div class="menu-container">
         <button class="icon-btn" onclick="toggleMenu()">⋮</button>
@@ -352,6 +420,7 @@ DOCTYPE html>
                 <select id="aiProvider" onchange="onProviderChange()">
                     <option value="gemini">🔵 Gemini (Google)</option>
                     <option value="groq">⚡ Groq (Gratis & Cepat)</option>
+                    <option value="dola">🟢 Dola AI</option>
                 </select>
                 <select id="modelVersion" onchange="saveVersion()">
                     <option value="fast">🚀 Cepat — respons kilat</option>
@@ -391,19 +460,21 @@ DOCTYPE html>
 </div>
 
 <script>
-    // Model map per provider dan versi
     const MODELS = {
         gemini: {
-            fast:  'gemini-2.0-flash',
-            deep:  'gemini-1.5-pro',
-            think: 'gemini-2.0-flash-thinking-exp',
-            task:  'gemini-1.5-pro'
+            fast:  'gemini-2.5-flash',
         },
         groq: {
             fast:  'llama-3.1-8b-instant',
             deep:  'llama-3.3-70b-versatile',
             think: 'deepseek-r1-distill-llama-70b',
             task:  'llama-3.3-70b-versatile'
+        },
+        dola: {
+            fast:  'dola-fast-v2',
+            deep:  'dola-deep-analysis',
+            think: 'dola-thinking-v5',
+            task:  'dola-task-expert'
         }
     };
 
@@ -414,10 +485,19 @@ DOCTYPE html>
         task:  'Kamu adalah Uzumaki AI, asisten cerdas ciptaan Manz Uzumaki yang ahli membantu tugas sekolah, pekerjaan, dan analisis. Jawab dengan jelas, terstruktur, dan mudah dipahami. Jangan sebut nama model atau perusahaan AI apapun.'
     };
 
-    let chatHistory = [];
-    let isLoading   = false;
+    let chatHistory      = [];
+    let isLoading        = false;
+    let abortCtrl        = null;
+    let currentSessionId = localStorage.getItem('uzumaki_active_session') || '';
+    let sessions         = JSON.parse(localStorage.getItem('uzumaki_sessions')) || [];
 
-    // Load saved settings
+    function resetBtn() {
+        isLoading = false;
+        if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
+        document.getElementById('sendBtn').disabled = false;
+        removeTyping();
+    }
+
     const savedProvider = localStorage.getItem('uzumaki_provider') || 'gemini';
     const savedVersion  = localStorage.getItem('uzumaki_version')  || 'fast';
     const savedKey      = localStorage.getItem('uzumaki_key_' + savedProvider) || '';
@@ -430,20 +510,28 @@ DOCTYPE html>
         showBadge(true, getProviderName(savedProvider) + ' aktif');
     }
 
+    if (!currentSessionId || !getSessionById(currentSessionId)) {
+        createNewSession();
+    } else {
+        loadSession(currentSessionId);
+    }
+    renderHistoryList();
+
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('menuDropdown');
-        const btns = document.querySelectorAll('.menu-container');
-        let inside = false;
-        btns.forEach(function(b) { if (b.contains(e.target)) inside = true; });
-        if (!inside) menu.classList.remove('show');
+        const hist = document.getElementById('historyDropdown');
+        const menuBtn = document.querySelector('.menu-container');
+        const histBtn = document.querySelector('.history-container');
+        
+        if (menuBtn && !menuBtn.contains(e.target)) menu.classList.remove('show');
+        if (histBtn && !histBtn.contains(e.target)) hist.classList.remove('show');
     });
 
-    function toggleMenu() {
-        document.getElementById('menuDropdown').classList.toggle('show');
-    }
+    function toggleMenu() { document.getElementById('menuDropdown').classList.toggle('show'); }
+    function toggleHistory() { document.getElementById('historyDropdown').classList.toggle('show'); }
 
     function onProviderChange() {
-        const p   = document.getElementById('aiProvider').value;
+        const p = document.getElementById('aiProvider').value;
         const key = localStorage.getItem('uzumaki_key_' + p) || '';
         document.getElementById('apiKeyInput').value = key;
         localStorage.setItem('uzumaki_provider', p);
@@ -456,7 +544,7 @@ DOCTYPE html>
     }
 
     function getProviderName(p) {
-        return { gemini:'Gemini', groq:'Groq' }[p] || p;
+        return { gemini:'Gemini', groq:'Groq', dola:'Dola AI' }[p] || p;
     }
 
     function saveApiKey() {
@@ -476,18 +564,114 @@ DOCTYPE html>
         el.style.display = 'block';
     }
 
-    function hideBadge() {
-        document.getElementById('apiBadge').style.display = 'none';
+    function hideBadge() { document.getElementById('apiBadge').style.display = 'none'; }
+
+    function getSessionById(id) {
+        for (let i = 0; i < sessions.length; i++) {
+            if (sessions[i].id === id) return sessions[i];
+        }
+        return null;
+    }
+
+    function createNewSession() {
+        currentSessionId = 'sess_' + Date.now();
+        localStorage.setItem('uzumaki_active_session', currentSessionId);
+        const newSess = { id: currentSessionId, title: 'Percakapan Baru', history: [] };
+        sessions.unshift(newSess);
+        localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+        chatHistory = [];
+        showWelcomeScreen();
+        renderHistoryList();
     }
 
     function newChat() {
-        chatHistory = [];
-        const chatArea = document.getElementById('chatArea');
-        chatArea.innerHTML = `
+        createNewSession();
+    }
+
+    function loadSession(id) {
+        currentSessionId = id;
+        localStorage.setItem('uzumaki_active_session', currentSessionId);
+        const sess = getSessionById(id);
+        if (sess) {
+            chatHistory = sess.history;
+            const chatArea = document.getElementById('chatArea');
+            chatArea.innerHTML = '';
+            if (chatHistory.length === 0) {
+                showWelcomeScreen();
+            } else {
+                for (let i = 0; i < chatHistory.length; i++) {
+                    renderBubbleDOM(chatHistory[i].role === 'assistant' ? 'ai' : 'user', chatHistory[i].content);
+                }
+            }
+        }
+        renderHistoryList();
+    }
+
+    function deleteSession(id, event) {
+        if (event) event.stopPropagation();
+        sessions = sessions.filter(function(s) { return s.id !== id; });
+        localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+        if (currentSessionId === id) {
+            if (sessions.length > 0) loadSession(sessions[0].id);
+            else createNewSession();
+        } else {
+            renderHistoryList();
+        }
+    }
+
+    function saveActiveHistoryToMemory() {
+        const sess = getSessionById(currentSessionId);
+        if (sess) {
+            sess.history = chatHistory;
+            if (chatHistory.length > 0 && sess.title === 'Percakapan Baru') {
+                let firstUserText = '';
+                for (let i = 0; i < chatHistory.length; i++) {
+                    if (chatHistory[i].role === 'user') { firstUserText = chatHistory[i].content; break; }
+                }
+                if (firstUserText) {
+                    sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
+                }
+            }
+            localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+            renderHistoryList();
+        }
+    }
+
+    function renderHistoryList() {
+        const listEl = document.getElementById('historyList');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        if (sessions.length === 0) {
+            listEl.innerHTML = '<div class="no-history">Tidak ada riwayat chat</div>';
+            return;
+        }
+        for (let i = 0; i < sessions.length; i++) {
+            const s = sessions[i];
+            const item = document.createElement('div');
+            item.className = 'history-item' + (s.id === currentSessionId ? ' active' : '');
+            item.setAttribute('onclick', "loadSession('" + s.id + "')");
+
+            const txt = document.createElement('span');
+            txt.className = 'history-text';
+            txt.textContent = s.title;
+
+            const del = document.createElement('button');
+            del.className = 'history-del';
+            del.innerHTML = '🗑️';
+            del.setAttribute('onclick', "deleteSession('" + s.id + "', event)");
+
+            item.appendChild(txt);
+            item.appendChild(del);
+            listEl.appendChild(item);
+        }
+    }
+
+    function showWelcomeScreen() {
+        document.getElementById('chatArea').innerHTML = `
             <div class="welcome">
                 <div class="logo">🍥</div>
-                <h3>Percakapan Baru</h3>
-                <p>Silakan mulai percakapan baru!</p>
+                <h3>Uzumaki AI</h3>
+                <p>Ketuk ⋮ di pojok kanan atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
             </div>`;
     }
 
@@ -496,7 +680,7 @@ DOCTYPE html>
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
 
-    function addBubble(role, text) {
+    function renderBubbleDOM(role, text) {
         const chatArea = document.getElementById('chatArea');
         const welcome  = chatArea.querySelector('.welcome');
         if (welcome) welcome.remove();
@@ -518,6 +702,10 @@ DOCTYPE html>
 
         chatArea.appendChild(row);
         chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function addBubble(role, text) {
+        renderBubbleDOM(role, text);
     }
 
     function showTyping() {
@@ -566,6 +754,7 @@ DOCTYPE html>
 
         addBubble('user', msg);
         chatHistory.push({ role: 'user', content: msg });
+        saveActiveHistoryToMemory();
 
         isLoading = true;
         document.getElementById('sendBtn').disabled = true;
@@ -578,12 +767,15 @@ DOCTYPE html>
             let reply = '';
             if (provider === 'gemini') {
                 reply = await callGemini(apiKey, model, systemPrompt);
-            } else {
+            } else if (provider === 'groq') {
                 reply = await callGroq(apiKey, model, systemPrompt);
+            } else {
+                reply = await callDolaAI(apiKey, model, systemPrompt);
             }
             removeTyping();
             addBubble('ai', reply);
             chatHistory.push({ role: 'assistant', content: reply });
+            saveActiveHistoryToMemory();
         } catch (err) {
             removeTyping();
             addBubble('ai', '❌ ' + err.message);
@@ -608,9 +800,19 @@ DOCTYPE html>
                 })
             }
         );
+        
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server API mengirimkan respons tidak valid (Bukan JSON). Status: " + res.status + ". Silakan periksa validitas API Key.");
+        }
+
         const data = await res.json();
         if (!res.ok) throw new Error((data.error && data.error.message) || 'Gemini error');
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, tidak ada respons.';
+        
+        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+            return data.candidates[0].content.parts[0].text;
+        }
+        return 'Maaf, tidak ada respons.';
     }
 
     async function callGroq(apiKey, model, systemPrompt) {
@@ -620,9 +822,43 @@ DOCTYPE html>
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
             body: JSON.stringify({ model: model, messages: messages })
         });
+        
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server API Groq mengirimkan respons tidak valid (Bukan JSON). Status: " + res.status + ". Silakan periksa sisa kuota atau konfigurasi API Key.");
+        }
+
         const data = await res.json();
         if (!res.ok) throw new Error((data.error && data.error.message) || 'Groq error ' + res.status);
-        return data.choices?.[0]?.message?.content || 'Maaf, tidak ada respons.';
+        
+        if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
+        return 'Maaf, tidak ada respons.';
+    }
+
+    async function callDolaAI(apiKey, model, systemPrompt) {
+        const PROXY = 'https://corsproxy.io/?url=';
+        const TARGET = 'https://api.dola.ai/v1/chat/completions';
+        const messages = [{ role: 'system', content: systemPrompt }].concat(chatHistory);
+        const res = await fetch(PROXY + encodeURIComponent(TARGET), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+            body: JSON.stringify({ model: model, messages: messages })
+        });
+        
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Proxy Server mengirimkan respons HTML. Status: " + res.status + ". Kemungkinan besar akses Proxy diblokir oleh sistem Dola AI atau endpoint sedang down.");
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error((data.error && data.error.message) || 'Dola AI error ' + res.status);
+        
+        if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
+        return 'Maaf, tidak ada respons.';
     }
 </script>
 </body>
