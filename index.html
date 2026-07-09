@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uzumaki AI</title>
+    <title>Aira AI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
 
@@ -45,14 +45,14 @@
 
         .header-info { flex: 1; }
         .header-info h2 { color: #fff; font-size: 15px; font-weight: 700; }
-        .header-info p  { color: #555; font-size: 11px; margin-top: 1px; }
+        .header-info p  { color: #ccc; font-size: 12px; margin-top: 2px; }
 
         .online-dot {
             width: 6px; height: 6px;
             background: #00e676;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 4px;
+            margin-right: 6px;
             animation: pulse 2s infinite;
         }
 
@@ -259,7 +259,7 @@
         }
 
         .welcome h3 { color:#fff; font-size:19px; font-weight:700; margin-bottom:6px; }
-        .welcome p  { color:#3a3a3a; font-size:13px; line-height:1.7; }
+        .welcome p  { color:#444; font-size:13px; line-height:1.7; }
 
         /* Bubbles */
         .msg-row {
@@ -290,6 +290,13 @@
             line-height: 1.65;
             word-break: break-word;
             white-space: pre-wrap;
+        }
+
+        .bubble img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: block;
         }
 
         /* USER — hitam glass */
@@ -338,15 +345,51 @@
             30%{transform:translateY(-7px)}
         }
 
-        /* ── Input area ── */
-        .input-area {
+        /* ── Input container & Area ── */
+        .input-container {
             width: 100%;
             max-width: 700px;
-            padding: 10px 14px 16px;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
             background: rgba(255,255,255,0.02);
             border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .preview-area {
+            display: none;
+            padding: 10px 16px;
+            position: relative;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .preview-area img {
+            max-height: 90px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .preview-close {
+            position: absolute;
+            top: 5px;
+            left: 100px;
+            background: #ff5252;
+            border: none;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 11px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .input-area {
+            width: 100%;
+            padding: 10px 14px 16px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
         }
 
         .input-area textarea {
@@ -368,6 +411,63 @@
         .input-area textarea:focus { border-color: rgba(255,107,0,0.35); }
         .input-area textarea::placeholder { color: #2e2e2e; }
 
+        /* Action Plus Button Menu */
+        .action-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .plus-btn {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50%;
+            color: #ccc;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .plus-btn:hover {
+            background: rgba(255,107,0,0.15);
+            border-color: #ff6b00;
+            color: #ff6b00;
+        }
+
+        .action-menu {
+            display: none;
+            position: absolute;
+            bottom: 52px;
+            left: 0;
+            background: #121212;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            min-width: 160px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 60;
+            overflow: hidden;
+        }
+
+        .action-menu.show { display: block; }
+
+        .action-menu div {
+            padding: 11px 14px;
+            color: #ddd;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-menu div:hover {
+            background: rgba(255,107,0,0.15);
+            color: #ff6b00;
+        }
+
         .send-btn {
             width: 42px; height: 42px;
             background: linear-gradient(135deg, #ff6b00, #ff0050);
@@ -381,7 +481,6 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            align-self: flex-end;
             box-shadow: 0 4px 14px rgba(255,107,0,0.25);
         }
 
@@ -392,16 +491,14 @@
 <body>
 
 <header>
-    <div class="avatar">🍥</div>
+      <div class="avatar">✨</div>
     <div class="header-info">
-        <h2>Uzumaki AI</h2>
-        <p><span class="online-dot"></span>Diciptakan oleh Manz Uzumaki</p>
+        <h2>Aira AI</h2>
+        <p><span class="online-dot"></span>• Diciptakan oleh Manz Uzumaki</p>
     </div>
 
-    <!-- Tombol percakapan baru -->
     <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">✏️</button>
 
-    <!-- Tombol Chat Bekas / Riwayat -->
     <div class="history-container">
         <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">🕒</button>
         <div class="history-dropdown" id="historyDropdown">
@@ -410,7 +507,6 @@
         </div>
     </div>
 
-    <!-- Menu titik tiga -->
     <div class="menu-container">
         <button class="icon-btn" onclick="toggleMenu()">⋮</button>
         <div class="menu-dropdown" id="menuDropdown">
@@ -420,7 +516,6 @@
                 <select id="aiProvider" onchange="onProviderChange()">
                     <option value="gemini">🔵 Gemini (Google)</option>
                     <option value="groq">⚡ Groq (Gratis & Cepat)</option>
-                    <option value="dola">🟢 Dola AI</option>
                 </select>
                 <select id="modelVersion" onchange="saveVersion()">
                     <option value="fast">🚀 Cepat — respons kilat</option>
@@ -445,62 +540,74 @@
 
 <div class="chat-area" id="chatArea">
     <div class="welcome">
-        <div class="logo">🍥</div>
-        <h3>Uzumaki AI</h3>
+        <div class="logo">✨</div>
+        <h3>Aira AI</h3>
         <p>Ketuk ⋮ di pojok kanan atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
     </div>
 </div>
 
-<div class="input-area">
-    <textarea id="msgInput" placeholder="Ketik pesan..." rows="1"
-        oninput="autoResize(this)"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
-    </textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+<div class="input-container">
+    <!-- Pratinjau Gambar Sebelum Dikirim -->
+    <div class="preview-area" id="previewArea">
+        <img src="" id="imgPreviewTarget" alt="Upload Preview">
+        <button class="preview-close" onclick="clearImageUpload()">×</button>
+    </div>
+
+    <div class="input-area">
+        <!-- Tombol Tanda Tambah ( + ) di sebelah kiri bawah teks ketikan -->
+        <div class="action-wrapper">
+            <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
+            <div class="action-menu" id="actionMenu">
+                <div onclick="triggerImageFile()">📷 Kirim Foto</div>
+                <div onclick="triggerTextToPhoto()">🎨 Buat Foto</div>
+            </div>
+        </div>
+        
+        <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="onFileSelected(this)">
+
+        <textarea id="msgInput" placeholder="Ketik pesan..." rows="1"
+            oninput="autoResize(this)"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
+        </textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
 </div>
 
 <script>
     const MODELS = {
         gemini: {
             fast:  'gemini-2.5-flash',
+            deep:  'gemini-2.5-pro',
+            think: 'gemini-2.5-flash-thinking',
+            task:  'gemini-2.5-pro'
         },
         groq: {
             fast:  'llama-3.1-8b-instant',
             deep:  'llama-3.3-70b-versatile',
             think: 'deepseek-r1-distill-llama-70b',
             task:  'llama-3.3-70b-versatile'
-        },
-        dola: {
-            fast:  'dola-fast-v2',
-            deep:  'dola-deep-analysis',
-            think: 'dola-thinking-v5',
-            task:  'dola-task-expert'
         }
     };
 
     const SYSTEM_PROMPTS = {
-        fast:  'Kamu adalah Uzumaki AI, asisten cerdas ciptaan Manz Uzumaki. Jawab singkat, padat, dan cepat. Jangan sebut nama model atau perusahaan AI apapun.',
-        deep:  'Kamu adalah Uzumaki AI, asisten cerdas ciptaan Manz Uzumaki. Berikan jawaban mendalam, terstruktur, dan komprehensif. Jangan sebut nama model atau perusahaan AI apapun.',
-        think: 'Kamu adalah Uzumaki AI, asisten cerdas ciptaan Manz Uzumaki. Pikirkan langkah demi langkah sebelum menjawab. Gunakan penalaran yang kuat dan logis. Jangan sebut nama model atau perusahaan AI apapun.',
-        task:  'Kamu adalah Uzumaki AI, asisten cerdas ciptaan Manz Uzumaki yang ahli membantu tugas sekolah, pekerjaan, dan analisis. Jawab dengan jelas, terstruktur, dan mudah dipahami. Jangan sebut nama model atau perusahaan AI apapun.'
+        fast:  'Nama kamu adalah Aira. Kamu adalah asisten cerdas yang diciptakan oleh Manz Uzumaki. Jawab singkat, padat, dan cepat. PENTING: Jangan pernah menambahkan kata "AI" setelah namamu, cukup sebut dirimu Aira.',
+        deep:  'Nama kamu adalah Aira. Kamu adalah asisten cerdas yang diciptakan oleh Manz Uzumaki. Berikan jawaban mendalam, terstruktur, dan komprehensif. PENTING: Jangan pernah menambahkan kata "AI" setelah namamu, cukup sebut dirimu Aira.',
+        think: 'Nama kamu adalah Aira. Kamu adalah asisten cerdas yang diciptakan oleh Manz Uzumaki. Pikirkan langkah demi langkah sebelum menjawab. Gunakan penalaran yang kuat dan logis. PENTING: Jangan pernah menambahkan kata "AI" setelah namamu, cukup sebut dirimu Aira.',
+        task:  'Nama kamu adalah Aira. Kamu adalah asisten cerdas yang diciptakan oleh Manz Uzumaki yang ahli membantu tugas sekolah, pekerjaan, dan analisis. PENTING: Jangan pernah menambahkan kata "AI" setelah namamu, cukup sebut dirimu Aira.'
     };
 
     let chatHistory      = [];
     let isLoading        = false;
-    let abortCtrl        = null;
-    let currentSessionId = localStorage.getItem('uzumaki_active_session') || '';
-    let sessions         = JSON.parse(localStorage.getItem('uzumaki_sessions')) || [];
+    let currentSessionId = localStorage.getItem('aira_active_session') || '';
+    let sessions         = JSON.parse(localStorage.getItem('aira_sessions')) || [];
+    
+    // Status Unggahan Gambar
+    let uploadedImageBase64 = '';
+    let uploadedImageMime   = '';
 
-    function resetBtn() {
-        isLoading = false;
-        if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
-        document.getElementById('sendBtn').disabled = false;
-        removeTyping();
-    }
-
-    const savedProvider = localStorage.getItem('uzumaki_provider') || 'gemini';
-    const savedVersion  = localStorage.getItem('uzumaki_version')  || 'fast';
-    const savedKey      = localStorage.getItem('uzumaki_key_' + savedProvider) || '';
+    const savedProvider = localStorage.getItem('aira_provider') || 'gemini';
+    const savedVersion  = localStorage.getItem('aira_version')  || 'fast';
+    const savedKey      = localStorage.getItem('aira_key_' + savedProvider) || '';
 
     document.getElementById('aiProvider').value   = savedProvider;
     document.getElementById('modelVersion').value = savedVersion;
@@ -517,42 +624,44 @@
     }
     renderHistoryList();
 
+    // Event menutup menu jika klik di area luar luar
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('menuDropdown');
         const hist = document.getElementById('historyDropdown');
-        const menuBtn = document.querySelector('.menu-container');
-        const histBtn = document.querySelector('.history-container');
+        const act  = document.getElementById('actionMenu');
         
-        if (menuBtn && !menuBtn.contains(e.target)) menu.classList.remove('show');
-        if (histBtn && !histBtn.contains(e.target)) hist.classList.remove('show');
+        if (!e.target.closest('.menu-container')) menu.classList.remove('show');
+        if (!e.target.closest('.history-container')) hist.classList.remove('show');
+        if (!e.target.closest('.action-wrapper')) act.classList.remove('show');
     });
 
     function toggleMenu() { document.getElementById('menuDropdown').classList.toggle('show'); }
     function toggleHistory() { document.getElementById('historyDropdown').classList.toggle('show'); }
+    function toggleActionMenu(e) { e.stopPropagation(); document.getElementById('actionMenu').classList.toggle('show'); }
 
     function onProviderChange() {
         const p = document.getElementById('aiProvider').value;
-        const key = localStorage.getItem('uzumaki_key_' + p) || '';
+        const key = localStorage.getItem('aira_key_' + p) || '';
         document.getElementById('apiKeyInput').value = key;
-        localStorage.setItem('uzumaki_provider', p);
+        localStorage.setItem('aira_provider', p);
         if (key) showBadge(true, getProviderName(p) + ' aktif');
         else     hideBadge();
     }
 
     function saveVersion() {
-        localStorage.setItem('uzumaki_version', document.getElementById('modelVersion').value);
+        localStorage.setItem('aira_version', document.getElementById('modelVersion').value);
     }
 
     function getProviderName(p) {
-        return { gemini:'Gemini', groq:'Groq', dola:'Dola AI' }[p] || p;
+        return { gemini:'Gemini', groq:'Groq' }[p] || p;
     }
 
     function saveApiKey() {
         const provider = document.getElementById('aiProvider').value;
         const key      = document.getElementById('apiKeyInput').value.trim();
         if (!key) { showBadge(false, 'API key kosong!'); return; }
-        localStorage.setItem('uzumaki_provider', provider);
-        localStorage.setItem('uzumaki_key_' + provider, key);
+        localStorage.setItem('aira_provider', provider);
+        localStorage.setItem('aira_key_' + provider, key);
         showBadge(true, getProviderName(provider) + ' tersimpan!');
         setTimeout(function() { document.getElementById('menuDropdown').classList.remove('show'); }, 700);
     }
@@ -566,6 +675,7 @@
 
     function hideBadge() { document.getElementById('apiBadge').style.display = 'none'; }
 
+    /* ── Manajemen Sesi & Chat Bekas ── */
     function getSessionById(id) {
         for (let i = 0; i < sessions.length; i++) {
             if (sessions[i].id === id) return sessions[i];
@@ -575,10 +685,10 @@
 
     function createNewSession() {
         currentSessionId = 'sess_' + Date.now();
-        localStorage.setItem('uzumaki_active_session', currentSessionId);
+        localStorage.setItem('aira_active_session', currentSessionId);
         const newSess = { id: currentSessionId, title: 'Percakapan Baru', history: [] };
         sessions.unshift(newSess);
-        localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+        localStorage.setItem('aira_sessions', JSON.stringify(sessions));
         chatHistory = [];
         showWelcomeScreen();
         renderHistoryList();
@@ -586,11 +696,12 @@
 
     function newChat() {
         createNewSession();
+        clearImageUpload();
     }
 
     function loadSession(id) {
         currentSessionId = id;
-        localStorage.setItem('uzumaki_active_session', currentSessionId);
+        localStorage.setItem('aira_active_session', currentSessionId);
         const sess = getSessionById(id);
         if (sess) {
             chatHistory = sess.history;
@@ -600,17 +711,23 @@
                 showWelcomeScreen();
             } else {
                 for (let i = 0; i < chatHistory.length; i++) {
-                    renderBubbleDOM(chatHistory[i].role === 'assistant' ? 'ai' : 'user', chatHistory[i].content);
+                    renderBubbleDOM(
+                        chatHistory[i].role === 'assistant' ? 'ai' : 'user', 
+                        chatHistory[i].content,
+                        chatHistory[i].image || null,
+                        chatHistory[i].generatedPhotoUrl || null
+                    );
                 }
             }
         }
         renderHistoryList();
+        clearImageUpload();
     }
 
     function deleteSession(id, event) {
         if (event) event.stopPropagation();
         sessions = sessions.filter(function(s) { return s.id !== id; });
-        localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+        localStorage.setItem('aira_sessions', JSON.stringify(sessions));
         if (currentSessionId === id) {
             if (sessions.length > 0) loadSession(sessions[0].id);
             else createNewSession();
@@ -628,11 +745,10 @@
                 for (let i = 0; i < chatHistory.length; i++) {
                     if (chatHistory[i].role === 'user') { firstUserText = chatHistory[i].content; break; }
                 }
-                if (firstUserText) {
-                    sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
-                }
+                if (!firstUserText) firstUserText = "Kirim / Buat Foto";
+                sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
             }
-            localStorage.setItem('uzumaki_sessions', JSON.stringify(sessions));
+            localStorage.setItem('aira_sessions', JSON.stringify(sessions));
             renderHistoryList();
         }
     }
@@ -669,8 +785,8 @@
     function showWelcomeScreen() {
         document.getElementById('chatArea').innerHTML = `
             <div class="welcome">
-                <div class="logo">🍥</div>
-                <h3>Uzumaki AI</h3>
+                <div class="logo">✨</div>
+                <h3>Aira AI</h3>
                 <p>Ketuk ⋮ di pojok kanan atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
             </div>`;
     }
@@ -680,7 +796,72 @@
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
 
-    function renderBubbleDOM(role, text) {
+    /* ── Penanganan & Unggah File Gambar ── */
+    function triggerImageFile() {
+        document.getElementById('hiddenFileInput').click();
+        document.getElementById('actionMenu').classList.remove('show');
+    }
+
+    function onFileSelected(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedImageBase64 = e.target.result.split(',')[1];
+            uploadedImageMime   = file.type;
+            
+            // Tampilkan Pratinjau
+            document.getElementById('imgPreviewTarget').src = e.target.result;
+            document.getElementById('previewArea').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearImageUpload() {
+        uploadedImageBase64 = '';
+        uploadedImageMime   = '';
+        document.getElementById('hiddenFileInput').value = '';
+        document.getElementById('previewArea').style.display = 'none';
+    }
+
+    /* ── Fitur Teks ke Foto (Text-To-Photo) ── */
+    function triggerTextToPhoto() {
+        document.getElementById('actionMenu').classList.remove('show');
+        const promptText = prompt("Masukkan deskripsi foto (prompt) yang ingin dihasilkan:");
+        if (!promptText || !promptText.trim()) return;
+
+        const chatArea = document.getElementById('chatArea');
+        const welcome  = chatArea.querySelector('.welcome');
+        if (welcome) welcome.remove();
+
+        // Tampilkan permintaan user ke DOM
+        const displayPrompt = "Hasilkan foto: " + promptText;
+        renderBubbleDOM('user', displayPrompt, null, null);
+        
+        chatHistory.push({ role: 'user', content: displayPrompt });
+        saveActiveHistoryToMemory();
+
+        showTyping();
+
+        // Menggunakan mesin generator rendering instan bebas-kunci pihak ketiga
+        const generatedUrl = 'https://image.pollinations.ai/p/' + encodeURIComponent(promptText.trim()) + '?width=800&height=800&nologo=true';
+
+        setTimeout(function() {
+            removeTyping();
+            renderBubbleDOM('ai', 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', null, generatedUrl);
+            
+            chatHistory.push({ 
+                role: 'assistant', 
+                content: 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', 
+                generatedPhotoUrl: generatedUrl 
+            });
+            saveActiveHistoryToMemory();
+        }, 1200);
+    }
+
+    /* ── Render Antarmuka Bubble Percakapan ── */
+    function renderBubbleDOM(role, text, imageData, generatedImageUrl) {
         const chatArea = document.getElementById('chatArea');
         const welcome  = chatArea.querySelector('.welcome');
         if (welcome) welcome.remove();
@@ -691,21 +872,36 @@
         if (role === 'ai') {
             const icon = document.createElement('div');
             icon.className   = 'ai-icon';
-            icon.textContent = '🍥';
+            icon.textContent = '✨';
             row.appendChild(icon);
         }
 
         const bubble = document.createElement('div');
-        bubble.className   = 'bubble ' + role;
-        bubble.textContent = text;
-        row.appendChild(bubble);
+        bubble.className = 'bubble ' + role;
 
+        // Jika terdapat lampiran foto kiriman user (Vision Mode)
+        if (imageData) {
+            const img = document.createElement('img');
+            img.src = 'data:' + imageData.mime + ';base64,' + imageData.data;
+            bubble.appendChild(img);
+        }
+
+        // Jika terdapat lampiran foto hasil generate (Text-to-Photo)
+        if (generatedImageUrl) {
+            const img = document.createElement('img');
+            img.src = generatedImageUrl;
+            bubble.appendChild(img);
+        }
+
+        if (text) {
+            const txtNode = document.createElement('span');
+            txtNode.textContent = text;
+            bubble.appendChild(txtNode);
+        }
+
+        row.appendChild(bubble);
         chatArea.appendChild(row);
         chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
-    function addBubble(role, text) {
-        renderBubbleDOM(role, text);
     }
 
     function showTyping() {
@@ -716,7 +912,7 @@
 
         const icon = document.createElement('div');
         icon.className   = 'ai-icon';
-        icon.textContent = '🍥';
+        icon.textContent = '✨';
 
         const dots = document.createElement('div');
         dots.className = 'typing';
@@ -733,12 +929,13 @@
         if (el) el.remove();
     }
 
+    /* ── Alur Pengiriman & Pemrosesan Pesan ── */
     async function sendMessage() {
         if (isLoading) return;
 
         const provider = document.getElementById('aiProvider').value;
         const version  = document.getElementById('modelVersion').value;
-        const apiKey   = localStorage.getItem('uzumaki_key_' + provider) || '';
+        const apiKey   = localStorage.getItem('aira_key_' + provider) || '';
 
         if (!apiKey) {
             document.getElementById('menuDropdown').classList.add('show');
@@ -747,15 +944,25 @@
 
         const input = document.getElementById('msgInput');
         const msg   = input.value.trim();
-        if (!msg) return;
+        
+        // Validasi agar pesan tidak kosong jika tidak ada gambar yang diunggah
+        if (!msg && !uploadedImageBase64) return;
 
         input.value        = '';
         input.style.height = 'auto';
 
-        addBubble('user', msg);
-        chatHistory.push({ role: 'user', content: msg });
+        let imageObj = null;
+        if (uploadedImageBase64) {
+            imageObj = { mime: uploadedImageMime, data: uploadedImageBase64 };
+        }
+
+        renderBubbleDOM('user', msg, imageObj, null);
+        
+        // Simpan objek data ke riwayat internal
+        chatHistory.push({ role: 'user', content: msg, image: imageObj });
         saveActiveHistoryToMemory();
 
+        // Kunci form input selama loading
         isLoading = true;
         document.getElementById('sendBtn').disabled = true;
         showTyping();
@@ -763,32 +970,50 @@
         const systemPrompt = SYSTEM_PROMPTS[version];
         const model        = MODELS[provider][version];
 
+        // Backup data gambar lokal saat ini sebelum fungsi pembersihan dipanggil
+        const processingImage = imageObj;
+        clearImageUpload();
+
         try {
             let reply = '';
             if (provider === 'gemini') {
                 reply = await callGemini(apiKey, model, systemPrompt);
-            } else if (provider === 'groq') {
-                reply = await callGroq(apiKey, model, systemPrompt);
             } else {
-                reply = await callDolaAI(apiKey, model, systemPrompt);
+                if (processingImage) {
+                    throw new Error("Model Groq saat ini belum dioptimalkan untuk memproses input gambar. Silakan beralih ke penyedia Gemini di opsi menu pengaturan.");
+                }
+                reply = await callGroq(apiKey, model, systemPrompt);
             }
             removeTyping();
-            addBubble('ai', reply);
+            renderBubbleDOM('ai', reply, null, null);
             chatHistory.push({ role: 'assistant', content: reply });
             saveActiveHistoryToMemory();
         } catch (err) {
             removeTyping();
-            addBubble('ai', '❌ ' + err.message);
+            renderBubbleDOM('ai', '❌ ' + err.message, null, null);
         } finally {
             isLoading = false;
             document.getElementById('sendBtn').disabled = false;
         }
     }
 
+    /* ── Pemanggilan API Core ── */
     async function callGemini(apiKey, model, systemPrompt) {
+        // Pemetaan struktur riwayat pesan agar sesuai dengan spesifikasi Gemini API
         const contents = chatHistory.map(function(m) {
-            return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
+            let parts = [];
+            if (m.image) {
+                parts.push({
+                    inline_data: {
+                        mime_type: m.image.mime,
+                        data: m.image.data
+                    }
+                });
+            }
+            parts.push({ text: m.content || "" });
+            return { role: m.role === 'assistant' ? 'model' : 'user', parts: parts };
         });
+
         const res = await fetch(
             'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
             {
@@ -796,14 +1021,16 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     system_instruction: { parts: [{ text: systemPrompt }] },
-                    contents: contents
+                    contents: contents,
+                    // Mengaktifkan fitur pencarian Google Search Grounding secara real-time
+                    tools: [{ google_search: {} }]
                 })
             }
         );
         
         const contentType = res.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server API mengirimkan respons tidak valid (Bukan JSON). Status: " + res.status + ". Silakan periksa validitas API Key.");
+            throw new Error("Server API mengirimkan respons tidak valid. Status: " + res.status + ". Silakan periksa kredensial API Key Anda.");
         }
 
         const data = await res.json();
@@ -812,11 +1039,16 @@
         if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
             return data.candidates[0].content.parts[0].text;
         }
-        return 'Maaf, tidak ada respons.';
+        return 'Maaf, Aira tidak menerima respon balik dari server.';
     }
 
     async function callGroq(apiKey, model, systemPrompt) {
-        const messages = [{ role: 'system', content: systemPrompt }].concat(chatHistory);
+        // Filter out any entries that might contain image payloads for standard text model Groq
+        const textOnlyHistory = chatHistory.map(function(m) {
+            return { role: m.role, content: m.content };
+        });
+
+        const messages = [{ role: 'system', content: systemPrompt }].concat(textOnlyHistory);
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -825,7 +1057,7 @@
         
         const contentType = res.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server API Groq mengirimkan respons tidak valid (Bukan JSON). Status: " + res.status + ". Silakan periksa sisa kuota atau konfigurasi API Key.");
+            throw new Error("Server API Groq mengirimkan respons tidak valid. Status: " + res.status);
         }
 
         const data = await res.json();
@@ -834,31 +1066,7 @@
         if (data && data.choices && data.choices[0] && data.choices[0].message) {
             return data.choices[0].message.content;
         }
-        return 'Maaf, tidak ada respons.';
-    }
-
-    async function callDolaAI(apiKey, model, systemPrompt) {
-        const PROXY = 'https://corsproxy.io/?url=';
-        const TARGET = 'https://api.dola.ai/v1/chat/completions';
-        const messages = [{ role: 'system', content: systemPrompt }].concat(chatHistory);
-        const res = await fetch(PROXY + encodeURIComponent(TARGET), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-            body: JSON.stringify({ model: model, messages: messages })
-        });
-        
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Proxy Server mengirimkan respons HTML. Status: " + res.status + ". Kemungkinan besar akses Proxy diblokir oleh sistem Dola AI atau endpoint sedang down.");
-        }
-
-        const data = await res.json();
-        if (!res.ok) throw new Error((data.error && data.error.message) || 'Dola AI error ' + res.status);
-        
-        if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
-        }
-        return 'Maaf, tidak ada respons.';
+        return 'Maaf, Aira tidak menerima respon balik dari server.';
     }
 </script>
 </body>
