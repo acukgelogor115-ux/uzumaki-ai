@@ -216,74 +216,114 @@
             justify-content: space-between;
             padding: 10px 12px;
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aira AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #030305; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden; position: relative; }
+        
+        /* ── BACKGROUND LAVA AURORA HIDUP ── */
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; filter: blur(140px); opacity: 0.45; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; mix-blend-mode: screen; animation: putarAurora 25s infinite alternate ease-in-out; }
+        .blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #ff3366 0%, transparent 70%); }
+        .blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #33ccff 0%, transparent 70%); animation-duration: 35s; animation-delay: -5s; }
+        .blob.three { top: 30%; left: 25%; width: 45vw; height: 45vw; background: radial-gradient(circle, #9933ff 0%, transparent 70%); animation-duration: 40s; animation-delay: -10s; }
+        
+        /* ── ANIMASI INTRO PREMIUM (BLUR TO CLEAR) ── */
+        .intro-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; justify-content: center; align-items: center; background-color: rgba(3, 3, 5, 0.98); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); animation: jernihMulus 3s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: none; }
+        .intro-text { font-size: 4rem; font-weight: 800; letter-spacing: -2px; background: linear-gradient(45deg, #ff3366, #ff9933, #33ccff, #9933ff, #ff3366); background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: aliranWarna 6s linear infinite, munculMulus 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .main-app-container { width: 100%; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px); animation: munculAplikasi 1.5s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards; }
+        
+        /* ── HEADER GLASSMORPHISM PREMIUM ── */
+        header { width: 100%; max-width: 700px; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: rgba(10, 10, 15, 0.4); backdrop-filter: blur(20px) saturate(120%); -webkit-backdrop-filter: blur(20px) saturate(120%); border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: sticky; top: 0; z-index: 10; }
+        .menu-btn { background: none; border: none; display: flex; flex-direction: column; justify-content: space-between; width: 22px; height: 9px; cursor: pointer; }
+        .menu-btn .bar { width: 100%; height: 2px; background-color: rgba(255,255,255,0.9); border-radius: 2px; }
+        .header-title h1 { color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; background: linear-gradient(180deg, #ffffff 0%, #aaaaaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .icon-btn { padding: 6px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; color: #eee; font-size: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.15); transform: scale(1.03); }
+        
+        /* ── CHAT & INPUT AREA ── */
+        .chat-area { width: 100%; max-width: 700px; padding: 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; height: calc(100vh - 140px); }
+        .welcome { text-align: center; margin: auto; padding: 40px 20px; }
+        .welcome h3 { color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .welcome p { color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.6; }
+        .input-container { width: 100%; max-width: 700px; padding: 16px; background: transparent; position: fixed; bottom: 0; z-index: 10; }
+        .input-wrapper { position: relative; display: flex; align-items: center; background: rgba(15, 15, 22, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 28px; padding: 6px 8px 6px 20px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, background 0.4s ease; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .chat-input { flex: 1; background: transparent; border: none; color: #fff; font-size: 14.5px; outline: none; padding: 10px 0; transition: all 0.3s ease; }
+        .chat-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .send-btn { background: #ffffff; border: none; color: #000; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .send-btn:hover { background: #ff3366; color: #fff; transform: scale(1.08) rotate(45deg); }
+        
+        /* 🔥 ANIMASI SAAT KOLOM INPUT DIKETIK/FOKUS 🔥 */
+        .input-wrapper:focus-within { transform: scale(1.015); border-color: transparent; box-shadow: 0 10px 35px rgba(153, 51, 255, 0.2), 0 0 15px rgba(51, 204, 255, 0.15); background: linear-gradient(#0e0e14, #0e0e14) padding-box, linear-gradient(45deg, #ff3366, #ff9933, #33ccff, #9933ff, #ff3366) border-box; background-size: 300% 300%; animation: aliranWarna 3s linear infinite; }
+        
+        /* ── KEYFRAMES UTAMA SISTEM ── */
+        @keyframes jernihMulus { 0% { backdrop-filter: blur(40px) saturate(180%); background-color: rgba(3, 3, 5, 0.98); } 60% { backdrop-filter: blur(20px) saturate(140%); background-color: rgba(3, 3, 5, 0.8); } 100% { backdrop-filter: blur(0px) saturate(100%); background-color: rgba(3, 3, 5, 0); visibility: hidden; } }
+        @keyframes aliranWarna { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes munculMulus { 0% { opacity: 0; transform: scale(0.85) translateY(30px); filter: blur(5px); } 25% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); } 75% { opacity: 1; transform: scale(1.01) translateY(0); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.05) translateY(-20px); filter: blur(12px); } }
+        @keyframes munculAplikasi { to { opacity: 1; transform: translateY(0); } }
+        @keyframes putarAurora { 0% { transform: translate(0px, 0px) rotate(0deg); } 50% { transform: translate(40px, -60px) rotate(180deg); } 100% { transform: translate(-20px, 20px) rotate(360deg); } }
+    </style>
+</head>
+<body>
 
-        .history-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.09);
-        }
+    <!-- Latar Belakang Aurora Abstrak Bergerak -->
+    <div class="aurora-bg">
+        <div class="blob one"></div>
+        <div class="blob two"></div>
+        <div class="blob three"></div>
+    </div>
 
-        .history-item.active {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.25);
-        }
+    <!-- Layar Pembuka Transisi Blur ke Jernih -->
+    <div class="intro-overlay" id="introScreen">
+        <div class="intro-text">Hello</div>
+    </div>
 
-        .history-text {
-            color: #ddd;
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            padding-right: 10px;
-        }
+    <!-- Container Utama Aplikasi Chatbot -->
+    <div class="main-app-container">
+        <header>
+            <button class="menu-btn">
+                <span class="bar"></span>
+                <span class="bar" style="margin-top: 5px; width: 75%;"></span>
+            </button>
+            <div class="header-title">
+                <h1>Aira AI</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn">History</button>
+            </div>
+        </header>
 
-        .history-del {
-            background: none;
-            border: none;
-            color: #ff5252;
-            cursor: pointer;
-            font-size: 12px;
-            padding: 2px 6px;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
+        <div class="chat-area">
+            <div class="welcome">
+                <h3>Aira AI</h3>
+                <p>Bagaimana saya bisa membantu Anda hari ini?</p>
+            </div>
+        </div>
 
-        .history-del:hover { opacity: 1; }
-        .no-history { text-align: center; color: #444; font-size: 12px; padding: 20px 0; }
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" class="chat-input" placeholder="Tanya Aira di sini...">
+                <button class="send-btn">➔</button>
+            </div>
+        </div>
+    </div>
 
-        /* ── Chat area ── */
-        .chat-area {
-            flex: 1;
-            width: 100%;
-            max-width: 700px;
-            padding: 20px 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            height: calc(100vh - 130px);
-        }
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const introScreen = document.getElementById("introScreen");
+            // Menghapus layar overlay pembuka dari DOM setelah 3 detik agar memori bersih
+            setTimeout(() => {
+                if(introScreen) {
+                    introScreen.remove();
+                }
+            }, 3000);
+        });
 
-        .welcome {
-            text-align: center;
-            margin: auto;
-            padding: 30px 20px;
-        }
-
-        .welcome h3 { color: #fff; font-size: 19px; font-weight: 700; margin-bottom: 8px; }
-        .welcome p  { color: #666; font-size: 13px; line-height: 1.7; }
-
-        /* Bubbles */
-        .msg-row {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
 
         .msg-row.user { justify-content: flex-end; }
         .msg-row.ai   { justify-content: flex-start; }
