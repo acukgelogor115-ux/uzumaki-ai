@@ -12,40 +12,103 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
-        
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .gradient-blob {
+            position: absolute;
+            opacity: 0.15;
+            filter: blur(80px);
+            border-radius: 50%;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -100px;
+            left: -100px;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .blob-2 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            bottom: -50px;
+            right: -50px;
+            animation: float 18s infinite ease-in-out reverse;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(30px, -50px);
+            }
+            50% {
+                transform: translate(-20px, 20px);
+            }
+            75% {
+                transform: translate(50px, 50px);
+            }
+        }
+
         .container {
             display: flex;
             height: 100vh;
+            gap: 1px;
+            background: rgba(0, 0, 0, 0.3);
         }
         
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 280px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            width: 320px;
+            background: rgba(20, 20, 40, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            border-radius: 0 20px 20px 0;
         }
         
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 32px;
+            color: #e0e0e0;
+            text-transform: uppercase;
+            font-weight: 600;
         }
         
         .new-chat-btn {
@@ -53,31 +116,52 @@
             color: white;
             border: none;
             padding: 12px 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .new-chat-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+        }
+
+        .new-chat-btn:active {
+            transform: translateY(0);
         }
         
         .chat-history {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chat-history::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .chat-item {
-            padding: 12px 16px;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
             font-size: 13px;
             white-space: nowrap;
             overflow: hidden;
@@ -85,14 +169,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: #a0a0a0;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
         }
         
         .chat-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            color: #e0e0e0;
         }
         
         .chat-item.active {
-            background: rgba(102, 126, 234, 0.2);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
             color: #667eea;
         }
         
@@ -101,9 +190,14 @@
             border: none;
             color: #ff6b6b;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0;
             transition: opacity 0.2s;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .chat-item:hover .delete-btn {
@@ -111,42 +205,70 @@
         }
         
         .settings-panel {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: auto;
+            backdrop-filter: blur(5px);
         }
         
         .settings-panel label {
             display: block;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             margin-bottom: 8px;
-            margin-top: 12px;
-            color: #aaa;
+            margin-top: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-panel label:first-child {
+            margin-top: 0;
         }
         
         .settings-panel input,
         .settings-panel select {
             width: 100%;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            color: #fff;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
             font-size: 12px;
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
         
         .settings-panel input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.25);
         }
         
         .settings-panel input:focus,
         .settings-panel select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .checkbox-label {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            color: #c0c0c0;
+        }
+
+        .checkbox-label input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
         }
         
         /* ===== MAIN CHAT AREA ===== */
@@ -154,55 +276,85 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            background: rgba(15, 15, 35, 0.5);
+            backdrop-filter: blur(5px);
         }
         
         .header {
-            padding: 20px;
+            padding: 20px 28px;
             background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
         .header-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
+            letter-spacing: -0.3px;
         }
         
         .header-meta {
             font-size: 12px;
-            color: #aaa;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
         }
         
         .settings-btn {
             background: none;
             border: none;
-            color: #fff;
+            color: #a0a0a0;
             cursor: pointer;
-            font-size: 20px;
-            transition: opacity 0.2s;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
         }
         
         .settings-btn:hover {
-            opacity: 0.7;
+            color: #e0e0e0;
+            background: rgba(255, 255, 255, 0.05);
         }
         
         .messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .message {
             display: flex;
             gap: 12px;
-            animation: slideIn 0.3s ease-in-out;
+            animation: slideIn 0.3s ease-out;
+            align-items: flex-end;
         }
-        
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -217,23 +369,23 @@
         .message.user {
             justify-content: flex-end;
         }
-        
-        .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            word-wrap: break-word;
-            line-height: 1.5;
-        }
-        
+
         .message.user .message-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border-radius: 16px 16px 4px 16px;
         }
         
-        .message.bot .message-content {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+        .message-content {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 16px 16px 16px 4px;
+            word-wrap: break-word;
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.06);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
         }
         
         .message-avatar {
@@ -243,27 +395,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             flex-shrink: 0;
+            font-weight: 600;
         }
         
         .message.user .message-avatar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            order: 2;
         }
         
         .message.bot .message-avatar {
-            background: rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
         }
         
         .loading {
             display: flex;
-            gap: 8px;
-            padding: 12px 16px;
+            gap: 6px;
+            padding: 2px 0;
+            align-items: center;
         }
         
         .loading-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.5);
             animation: bounce 1.4s infinite;
@@ -279,14 +436,14 @@
         
         @keyframes bounce {
             0%, 80%, 100% { transform: scale(1); opacity: 0.5; }
-            40% { transform: scale(1.3); opacity: 1; }
+            40% { transform: scale(1.2); opacity: 1; }
         }
         
         /* ===== INPUT AREA ===== */
         .input-area {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 28px;
+            background: rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .input-container {
@@ -297,25 +454,27 @@
         
         .input-field {
             flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
             padding: 12px 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 14px;
             resize: none;
             max-height: 120px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: inherit;
+            transition: all 0.3s ease;
         }
         
         .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.3);
         }
         
         .input-field:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 12px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.08);
         }
         
         .send-btn {
@@ -324,22 +483,23 @@
             color: white;
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
         
         .send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
         }
         
         .send-btn:active {
-            transform: scale(0.95);
+            transform: translateY(0);
         }
         
         .send-btn:disabled {
@@ -355,10 +515,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
         
         .modal.active {
@@ -366,64 +537,161 @@
         }
         
         .modal-content {
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 12px;
+            background: rgba(20, 20, 40, 0.95);
+            padding: 32px;
+            border-radius: 16px;
             max-width: 500px;
             width: 90%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
         }
         
         .modal-content h2 {
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 24px;
+            color: #e0e0e0;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .modal-content label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            margin-top: 15px;
+            margin-top: 12px;
             margin-bottom: 8px;
-            color: #aaa;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-content label:first-of-type {
+            margin-top: 0;
         }
         
         .modal-content input,
-        .modal-content select {
+        .modal-content select,
+        .modal-content textarea {
             width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            color: #fff;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
             font-size: 13px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .modal-content textarea {
+            resize: vertical;
+            min-height: 100px;
+            max-height: 200px;
         }
         
         .modal-content input:focus,
-        .modal-content select:focus {
+        .modal-content select:focus,
+        .modal-content textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .provider-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .provider-option {
+            position: relative;
+        }
+
+        .provider-option input[type="radio"] {
+            display: none;
+        }
+
+        .provider-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .provider-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            border-color: #667eea;
+            color: #667eea;
         }
         
         .modal-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 25px;
+            gap: 12px;
+            margin-top: 28px;
             justify-content: flex-end;
         }
         
         .modal-buttons button {
             padding: 10px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .modal-buttons .btn-primary {
@@ -433,34 +701,25 @@
         
         .modal-buttons .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
         }
         
         .modal-buttons .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #aaa;
+            background: rgba(255, 255, 255, 0.08);
+            color: #a0a0a0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .modal-buttons .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            color: #e0e0e0;
         }
-        
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+
+        .api-key-group {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.02);
         }
         
         /* ===== RESPONSIVE ===== */
@@ -472,32 +731,43 @@
             .message-content {
                 max-width: 85%;
             }
+
+            .modal-content {
+                max-width: 95%;
+                padding: 24px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="background-animation">
+        <div class="gradient-blob blob-1"></div>
+        <div class="gradient-blob blob-2"></div>
+        <div class="gradient-blob blob-3"></div>
+    </div>
+
     <div class="container">
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <div class="logo">✨ Aira AI</div>
-            <button class="new-chat-btn" onclick="createNewChat()">+ New Chat</button>
+            <div class="logo">Aira</div>
+            <button class="new-chat-btn" onclick="createNewChat()">New Chat</button>
             <div class="chat-history" id="chatHistory"></div>
             
             <div class="settings-panel">
-                <label>🔑 Gemini API Key</label>
-                <input type="password" id="geminiKey" placeholder="Enter Gemini API key">
-                
-                <label>🔑 Groq API Key</label>
-                <input type="password" id="groqKey" placeholder="Enter Groq API key">
-                
-                <label>🤖 Default Provider</label>
+                <label>Default Provider</label>
                 <select id="defaultProvider">
                     <option value="gemini">Gemini</option>
                     <option value="groq">Groq</option>
                 </select>
                 
-                <label style="margin-top: 15px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-                    <input type="checkbox" id="autoSave" checked style="width: auto; cursor: pointer;">
+                <label>Gemini API Key</label>
+                <input type="password" id="geminiKey" placeholder="Enter API key">
+                
+                <label>Groq API Key</label>
+                <input type="password" id="groqKey" placeholder="Enter API key">
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" id="autoSave" checked>
                     Auto-save settings
                 </label>
             </div>
@@ -507,19 +777,19 @@
         <div class="chat-container">
             <!-- HEADER -->
             <div class="header">
-                <div>
-                    <div class="header-title">Aira AI Chat</div>
-                    <div class="header-meta" id="modelDisplay">Gemini - Latest</div>
+                <div class="header-info">
+                    <div class="header-title">Aira Chat</div>
+                    <div class="header-meta" id="modelDisplay">Gemini Latest</div>
                 </div>
-                <button class="settings-btn" onclick="openSettingsModal()">⚙️</button>
+                <button class="settings-btn" onclick="openSettingsModal()">⚙</button>
             </div>
 
             <!-- MESSAGES -->
             <div class="messages" id="messagesContainer">
                 <div class="message bot">
-                    <div class="message-avatar">✨</div>
+                    <div class="message-avatar">A</div>
                     <div class="message-content">
-                        Halo! Saya adalah <strong>Aira AI</strong>, asisten virtual Anda yang cerdas dan responsif. Saya dapat membantu Anda dengan berbagai tugas menggunakan Gemini atau Groq. Apa yang bisa saya bantu hari ini?
+                        Hello! I'm Aira, your intelligent AI assistant. I can help you with various tasks, coding, writing, analysis, brainstorming, and more. What would you like to know?
                     </div>
                 </div>
             </div>
@@ -527,8 +797,8 @@
             <!-- INPUT -->
             <div class="input-area">
                 <div class="input-container">
-                    <textarea class="input-field" id="messageInput" placeholder="Ketik pesan Anda di sini..." rows="1"></textarea>
-                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                    <textarea class="input-field" id="messageInput" placeholder="Type your message here..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">→</button>
                 </div>
             </div>
         </div>
@@ -537,22 +807,38 @@
     <!-- SETTINGS MODAL -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h2>⚙️ Settings</h2>
+            <h2>Settings</h2>
             
-            <label>🔑 Gemini API Key</label>
-            <input type="password" id="modalGeminiKey" placeholder="Enter your Gemini API key">
-            
-            <label>🔑 Groq API Key</label>
-            <input type="password" id="modalGroqKey" placeholder="Enter your Groq API key">
-            
-            <label>🤖 Default Provider</label>
-            <select id="modalProvider">
-                <option value="gemini">Gemini</option>
-                <option value="groq">Groq</option>
-            </select>
-            
-            <label>🧠 AI System Prompt</label>
-            <textarea id="modalSystemPrompt" placeholder="Customize AI behavior..." style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 13px; resize: vertical; height: 100px;"></textarea>
+            <div class="modal-section">
+                <div class="modal-section-title">AI Provider</div>
+                <div class="provider-selector">
+                    <div class="provider-option">
+                        <input type="radio" id="providerGemini" name="provider" value="gemini" checked>
+                        <label for="providerGemini">Gemini</label>
+                    </div>
+                    <div class="provider-option">
+                        <input type="radio" id="providerGroq" name="provider" value="groq">
+                        <label for="providerGroq">Groq</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-title">API Keys</div>
+                <div class="api-key-group">
+                    <label>Gemini API Key</label>
+                    <input type="password" id="modalGeminiKey" placeholder="Enter your Gemini API key">
+                    
+                    <label>Groq API Key</label>
+                    <input type="password" id="modalGroqKey" placeholder="Enter your Groq API key">
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-title">System Configuration</div>
+                <label>AI Behavior</label>
+                <textarea id="modalSystemPrompt" placeholder="System prompt will be loaded from code..."></textarea>
+            </div>
             
             <div class="modal-buttons">
                 <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
@@ -562,23 +848,27 @@
     </div>
 
     <script>
+        // ===== SYSTEM PROMPT (IN CODE) =====
+        const SYSTEM_PROMPT = `You are Aira, an intelligent, friendly, and highly responsive AI assistant. You are designed to provide accurate, informative, and relevant answers across various domains.
+
+Core Characteristics:
+- Always maintain a professional yet warm tone
+- Provide clear, well-structured explanations
+- Use bullet points or numbered lists when appropriate
+- Able to assist with: coding, writing, analysis, brainstorming, research, and problem-solving
+- Can work across multiple knowledge domains
+- Responsive to follow-up questions and feedback
+- Honest about limitations and knowledge gaps
+- Format responses clearly with proper structure
+- Use code blocks for technical content when relevant
+
+Your goal is to be as helpful, accurate, and efficient as possible while maintaining clarity and professionalism.`;
+
         // ===== CONFIG & STATE =====
         const CONFIG = {
             GEMINI_API: 'https://generativelanguage.googleapis.com/v1beta/models',
             GROQ_API: 'https://api.groq.com/openai/v1/chat/completions',
         };
-
-        const DEFAULT_SYSTEM_PROMPT = `Anda adalah Aira AI, asisten virtual yang cerdas, ramah, dan sangat membantu. Anda dirancang untuk memberikan jawaban yang akurat, informatif, dan relevan dalam Bahasa Indonesia. 
-
-Karakteristik Anda:
-- Selalu bersikap profesional namun hangat
-- Memberikan penjelasan yang jelas dan mudah dipahami
-- Siap membantu berbagai topik: coding, writing, analysis, brainstorming, dll
-- Dapat mengakses berbagai domain pengetahuan
-- Responsif terhadap feedback dan pertanyaan lanjutan
-- Honest tentang keterbatasan dan tidak tahu
-
-Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan konteks yang jelas.`;
 
         let state = {
             currentChatId: null,
@@ -587,7 +877,7 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
                 geminiKey: '',
                 groqKey: '',
                 defaultProvider: 'gemini',
-                systemPrompt: DEFAULT_SYSTEM_PROMPT,
+                systemPrompt: SYSTEM_PROMPT,
                 autoSave: true
             }
         };
@@ -601,7 +891,6 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
 
         function setupEventListeners() {
             const input = document.getElementById('messageInput');
-            const sendBtn = document.getElementById('sendBtn');
             
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -628,6 +917,8 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
 
             document.getElementById('defaultProvider').addEventListener('change', (e) => {
                 state.settings.defaultProvider = e.target.value;
+                document.getElementById('providerGemini').checked = e.target.value === 'gemini';
+                document.getElementById('providerGroq').checked = e.target.value === 'groq';
                 if (state.settings.autoSave) saveSettings();
                 updateModelDisplay();
             });
@@ -635,6 +926,15 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             document.getElementById('autoSave').addEventListener('change', (e) => {
                 state.settings.autoSave = e.target.checked;
                 saveSettings();
+            });
+
+            // Modal provider selector
+            document.querySelectorAll('input[name="provider"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    state.settings.defaultProvider = e.target.value;
+                    document.getElementById('defaultProvider').value = e.target.value;
+                    updateModelDisplay();
+                });
             });
         }
 
@@ -654,7 +954,7 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
         }
 
         function deleteChat(chatId) {
-            if (confirm('Hapus chat ini?')) {
+            if (confirm('Delete this chat?')) {
                 delete state.chats[chatId];
                 if (state.currentChatId === chatId) {
                     const chatIds = Object.keys(state.chats);
@@ -677,10 +977,12 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             const container = document.getElementById('messagesContainer');
             container.innerHTML = '';
             
-            if (state.chats[chatId]) {
+            if (state.chats[chatId] && state.chats[chatId].messages.length > 0) {
                 state.chats[chatId].messages.forEach(msg => {
                     addMessageToUI(msg.content, msg.type, false);
                 });
+            } else {
+                clearMessages();
             }
         }
 
@@ -693,7 +995,7 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
                 chatEl.className = `chat-item ${chat.id === state.currentChatId ? 'active' : ''}`;
                 chatEl.innerHTML = `
                     <span style="flex: 1; cursor: pointer;" onclick="selectChat('${chat.id}')">${chat.title}</span>
-                    <button class="delete-btn" onclick="event.stopPropagation(); deleteChat('${chat.id}')">✕</button>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteChat('${chat.id}')">×</button>
                 `;
                 historyContainer.appendChild(chatEl);
             });
@@ -708,17 +1010,17 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             
             // Validate API keys
             if (!state.settings.geminiKey && !state.settings.groqKey) {
-                alert('❌ Silakan masukkan API Key Gemini atau Groq di sidebar!');
+                alert('Please enter an API Key in the settings panel.');
                 return;
             }
             
             const provider = state.settings.defaultProvider;
             if (provider === 'gemini' && !state.settings.geminiKey) {
-                alert('❌ Gemini API Key tidak tersedia!');
+                alert('Gemini API Key is not available.');
                 return;
             }
             if (provider === 'groq' && !state.settings.groqKey) {
-                alert('❌ Groq API Key tidak tersedia!');
+                alert('Groq API Key is not available.');
                 return;
             }
 
@@ -738,7 +1040,7 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
                 
                 addMessageToUI(response, 'bot', true);
             } catch (error) {
-                addMessageToUI(`❌ Error: ${error.message}`, 'bot', true);
+                addMessageToUI(`Error: ${error.message}`, 'bot', true);
             } finally {
                 document.getElementById('sendBtn').disabled = false;
             }
@@ -748,15 +1050,23 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             const container = document.getElementById('messagesContainer');
             
             // Remove loading indicator
-            const loading = container.querySelector('.message .loading');
-            if (loading) loading.parentElement.remove();
+            const loadingMsg = container.querySelector('.message.bot .loading');
+            if (loadingMsg) loadingMsg.parentElement.parentElement.remove();
             
             const msgEl = document.createElement('div');
             msgEl.className = `message ${type}`;
-            msgEl.innerHTML = `
-                <div class="message-avatar">${type === 'user' ? '👤' : '✨'}</div>
-                <div class="message-content">${escapeHtml(content)}</div>
-            `;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = type === 'user' ? 'U' : 'A';
+            
+            const content_div = document.createElement('div');
+            content_div.className = 'message-content';
+            content_div.textContent = content;
+            
+            msgEl.appendChild(avatar);
+            msgEl.appendChild(content_div);
+            
             container.appendChild(msgEl);
             container.scrollTop = container.scrollHeight;
             
@@ -773,14 +1083,22 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             const container = document.getElementById('messagesContainer');
             const loadingEl = document.createElement('div');
             loadingEl.className = 'message bot';
-            loadingEl.innerHTML = `
-                <div class="message-avatar">✨</div>
-                <div class="loading">
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                </div>
-            `;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = 'A';
+            
+            const loading = document.createElement('div');
+            loading.className = 'loading';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'loading-dot';
+                loading.appendChild(dot);
+            }
+            
+            loadingEl.appendChild(avatar);
+            loadingEl.appendChild(loading);
             container.appendChild(loadingEl);
             container.scrollTop = container.scrollHeight;
         }
@@ -789,9 +1107,9 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             const container = document.getElementById('messagesContainer');
             container.innerHTML = `
                 <div class="message bot">
-                    <div class="message-avatar">✨</div>
+                    <div class="message-avatar">A</div>
                     <div class="message-content">
-                        Halo! Saya adalah <strong>Aira AI</strong>, asisten virtual Anda yang cerdas dan responsif. Bagaimana saya bisa membantu Anda?
+                        Hello! I'm Aira, your intelligent AI assistant. I can help you with various tasks, coding, writing, analysis, brainstorming, and more. What would you like to know?
                     </div>
                 </div>
             `;
@@ -894,7 +1212,8 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             document.getElementById('settingsModal').classList.add('active');
             document.getElementById('modalGeminiKey').value = state.settings.geminiKey;
             document.getElementById('modalGroqKey').value = state.settings.groqKey;
-            document.getElementById('modalProvider').value = state.settings.defaultProvider;
+            document.getElementById('providerGemini').checked = state.settings.defaultProvider === 'gemini';
+            document.getElementById('providerGroq').checked = state.settings.defaultProvider === 'groq';
             document.getElementById('modalSystemPrompt').value = state.settings.systemPrompt;
         }
 
@@ -903,6 +1222,10 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
         }
 
         function saveSettings() {
+            state.settings.geminiKey = document.getElementById('modalGeminiKey').value;
+            state.settings.groqKey = document.getElementById('modalGroqKey').value;
+            state.settings.defaultProvider = document.querySelector('input[name="provider"]:checked').value;
+            
             localStorage.setItem('airaAI_state', JSON.stringify(state));
             
             // Update sidebar inputs
@@ -910,6 +1233,8 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             document.getElementById('groqKey').value = state.settings.groqKey;
             document.getElementById('defaultProvider').value = state.settings.defaultProvider;
             document.getElementById('autoSave').checked = state.settings.autoSave;
+            
+            updateModelDisplay();
         }
 
         function loadSettings() {
@@ -917,6 +1242,7 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
             if (saved) {
                 const loaded = JSON.parse(saved);
                 state = { ...state, ...loaded };
+                state.settings.systemPrompt = SYSTEM_PROMPT;
             }
             
             document.getElementById('geminiKey').value = state.settings.geminiKey;
@@ -929,15 +1255,8 @@ Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan ko
 
         function updateModelDisplay() {
             const provider = state.settings.defaultProvider;
-            const modelText = provider === 'gemini' ? 'Gemini - Latest' : 'Groq - Mixtral 8x7B';
+            const modelText = provider === 'gemini' ? 'Gemini Latest' : 'Groq Mixtral 8x7B';
             document.getElementById('modelDisplay').textContent = modelText;
-        }
-
-        // ===== UTILITIES =====
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         // Close modal on outside click
