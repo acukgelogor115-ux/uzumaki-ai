@@ -38,6 +38,7 @@
         body {
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         button {
@@ -49,61 +50,72 @@
         /* ==================== HEADER ==================== */
         header {
             position: relative;
-            z-index: 100;
+            z-index: 50;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 18px;
+            padding: 16px 14px;
             padding-top: max(16px, env(safe-area-inset-top));
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
-            background: rgba(10, 10, 18, 0.5);
+            background: rgba(10, 10, 18, 0.8);
+            gap: 12px;
         }
 
         .menu-container {
             position: relative;
+            flex-shrink: 0;
+            z-index: 200;
         }
 
         .menu-btn {
             background: none;
             border: none;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 4px;
+            align-items: center;
+            gap: 5px;
             padding: 0;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .menu-btn .bar {
             width: 20px;
-            height: 2px;
+            height: 2.5px;
             background: #fff;
-            border-radius: 1px;
+            border-radius: 2px;
             transition: all 0.3s ease;
         }
 
         .menu-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
+            position: fixed;
+            top: max(60px, env(safe-area-inset-top) + 50px);
             left: 0;
-            background: rgba(26, 26, 46, 0.95);
+            right: auto;
+            background: rgba(26, 26, 46, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-top: none;
+            border-left: none;
+            border-radius: 0 12px 12px 0;
             backdrop-filter: blur(20px);
-            min-width: 280px;
-            max-height: 0;
-            overflow: hidden;
+            min-width: 320px;
+            max-width: 90vw;
+            max-height: 70vh;
+            overflow-y: auto;
             opacity: 0;
-            transition: all 0.3s ease;
+            transform: translateX(-100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
+            z-index: 200;
         }
 
         .menu-dropdown.show {
-            max-height: 500px;
             opacity: 1;
+            transform: translateX(0);
             pointer-events: auto;
         }
 
@@ -125,7 +137,7 @@
 
         .menu-inner select,
         .menu-inner input {
-            padding: 8px 12px;
+            padding: 10px 12px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
@@ -142,7 +154,7 @@
         }
 
         .menu-inner button {
-            padding: 8px 12px;
+            padding: 10px 12px;
             background: linear-gradient(135deg, var(--violet), var(--pink));
             border: none;
             border-radius: 8px;
@@ -150,6 +162,7 @@
             font-size: 13px;
             font-weight: 600;
             transition: opacity 0.2s ease;
+            cursor: pointer;
         }
 
         .menu-inner button:hover {
@@ -163,11 +176,11 @@
         }
 
         .api-badge {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
             text-align: center;
-            margin-top: 4px;
+            margin-top: 6px;
             display: none;
             animation: fadeIn 0.3s ease;
         }
@@ -184,6 +197,13 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
+        .api-warning {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -192,11 +212,12 @@
         .header-title {
             flex: 1;
             text-align: center;
+            min-width: 0;
         }
 
         .header-title h1 {
             font-family: 'Sora', sans-serif;
-            font-size: 18px;
+            font-size: clamp(16px, 4vw, 20px);
             font-weight: 700;
             background: linear-gradient(90deg, var(--pink), var(--amber));
             -webkit-background-clip: text;
@@ -207,6 +228,8 @@
         .header-actions {
             display: flex;
             gap: 8px;
+            flex-shrink: 0;
+            z-index: 50;
         }
 
         .icon-btn {
@@ -218,37 +241,43 @@
             font-size: 12px;
             font-weight: 600;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            touch-action: manipulation;
         }
 
-        .icon-btn:hover {
+        .icon-btn:active {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
         }
 
         .history-container {
             position: relative;
+            flex-shrink: 0;
+            z-index: 100;
         }
 
         .history-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background: rgba(26, 26, 46, 0.95);
+            position: fixed;
+            top: max(60px, env(safe-area-inset-top) + 50px);
+            right: 14px;
+            background: rgba(26, 26, 46, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             backdrop-filter: blur(20px);
-            min-width: 250px;
-            max-height: 0;
+            min-width: 280px;
+            max-width: 90vw;
+            max-height: 70vh;
             overflow: hidden;
             opacity: 0;
+            transform: translateY(-10px);
             transition: all 0.3s ease;
             pointer-events: none;
-            z-index: 101;
+            z-index: 150;
         }
 
         .history-dropdown.show {
-            max-height: 400px;
             opacity: 1;
+            transform: translateY(0);
             pointer-events: auto;
             overflow-y: auto;
         }
@@ -269,9 +298,10 @@
             gap: 8px;
             margin-bottom: 4px;
             font-size: 13px;
+            touch-action: manipulation;
         }
 
-        .history-item:hover {
+        .history-item:active {
             background: rgba(255, 255, 255, 0.08);
         }
 
@@ -297,9 +327,10 @@
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
+            touch-action: manipulation;
         }
 
-        .history-del:hover {
+        .history-del:active {
             background: rgba(239, 68, 68, 0.3);
         }
 
@@ -314,6 +345,7 @@
         .chat-area {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px 16px;
             display: flex;
             flex-direction: column;
@@ -386,10 +418,11 @@
             font-size: 12px;
             font-weight: 700;
             margin-top: 4px;
+            flex-shrink: 0;
         }
 
         .bubble {
-            max-width: 70%;
+            max-width: 75%;
             padding: 12px 16px;
             border-radius: 16px;
             font-size: 14px;
@@ -398,6 +431,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            overflow-x: hidden;
         }
 
         .bubble.ai {
@@ -459,9 +493,10 @@
             z-index: 10;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
-            background: rgba(10, 10, 18, 0.5);
+            background: rgba(10, 10, 18, 0.8);
             padding: 12px 14px;
             padding-bottom: max(12px, env(safe-area-inset-bottom));
+            flex-shrink: 0;
         }
 
         .preview-area {
@@ -502,33 +537,35 @@
 
         .action-wrapper {
             position: relative;
+            flex-shrink: 0;
         }
 
         .plus-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--violet), var(--pink));
             border: none;
             border-radius: 50%;
             color: #fff;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
             flex-shrink: 0;
+            touch-action: manipulation;
         }
 
-        .plus-btn:hover {
-            transform: scale(1.05);
+        .plus-btn:active {
+            transform: scale(0.95);
         }
 
         .action-menu {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            background: rgba(26, 26, 46, 0.95);
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom) + 50px);
+            left: 14px;
+            background: rgba(26, 26, 46, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             backdrop-filter: blur(20px);
@@ -538,7 +575,7 @@
             opacity: 0;
             transition: all 0.3s ease;
             pointer-events: none;
-            z-index: 101;
+            z-index: 120;
         }
 
         .action-menu.show {
@@ -548,24 +585,25 @@
         }
 
         .action-menu div {
-            padding: 10px 16px;
+            padding: 12px 16px;
             cursor: pointer;
             font-size: 13px;
             transition: all 0.2s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            touch-action: manipulation;
         }
 
         .action-menu div:last-child {
             border-bottom: none;
         }
 
-        .action-menu div:hover {
+        .action-menu div:active {
             background: rgba(255, 255, 255, 0.08);
         }
 
         #msgInput {
             flex: 1;
-            min-height: 36px;
+            min-height: 40px;
             max-height: 120px;
             padding: 10px 14px;
             background: rgba(255, 255, 255, 0.06);
@@ -590,23 +628,24 @@
         }
 
         .send-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--violet), var(--pink));
             border: none;
             border-radius: 50%;
             color: #fff;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
             flex-shrink: 0;
+            touch-action: manipulation;
         }
 
-        .send-btn:hover:not(:disabled) {
-            transform: scale(1.05);
+        .send-btn:active:not(:disabled) {
+            transform: scale(0.95);
         }
 
         .send-btn:disabled {
@@ -614,26 +653,52 @@
             cursor: not-allowed;
         }
 
+        /* ==================== MODAL BACKDROP ==================== */
+        .menu-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 99;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-backdrop.show {
+            opacity: 0.3;
+            pointer-events: auto;
+        }
+
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 480px) {
-            .bubble {
-                max-width: 85%;
+            header {
+                padding: 12px 12px;
             }
 
-            .menu-dropdown,
-            .history-dropdown {
-                min-width: 100vw;
-                right: -14px;
-                left: auto;
+            .menu-btn {
+                width: 36px;
+                height: 36px;
             }
 
             .header-title h1 {
-                font-size: 16px;
+                font-size: 18px;
+            }
+
+            .bubble {
+                max-width: 85%;
             }
 
             .icon-btn {
                 padding: 6px 10px;
                 font-size: 11px;
+            }
+
+            .menu-dropdown {
+                min-width: 300px;
+            }
+
+            .history-dropdown {
+                min-width: 260px;
             }
         }
 
@@ -646,6 +711,9 @@
     </style>
 </head>
 <body>
+    <!-- Menu Backdrop -->
+    <div class="menu-backdrop" id="menuBackdrop" onclick="closeAllMenus()"></div>
+
     <!-- HEADER -->
     <header>
         <div class="menu-container">
@@ -675,9 +743,7 @@
                     <input type="password" id="apiKeyInput" placeholder="Masukkan API key...">
                     <button onclick="saveApiKey()">Simpan</button>
                     <div class="api-badge" id="apiBadge"></div>
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">
-                        ⚠️ Key disimpan lokal di browser Anda
-                    </div>
+                    <div class="api-warning">⚠️ Key disimpan lokal di browser Anda</div>
                 </div>
             </div>
         </div>
@@ -733,10 +799,10 @@
     <script>
         // ==================== CONFIG ====================
         const CONFIG = {
-            MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+            MAX_FILE_SIZE: 5 * 1024 * 1024,
             ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-            MAX_HISTORY_MESSAGES: 15, // Token limit safeguard
-            API_TIMEOUT: 30000 // 30 seconds
+            MAX_HISTORY_MESSAGES: 15,
+            API_TIMEOUT: 30000
         };
 
         const MODELS = {
@@ -820,26 +886,66 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
         // ==================== UI HANDLERS ====================
         document.addEventListener('click', function (e) {
-            const menu = document.getElementById('menuDropdown');
-            const hist = document.getElementById('historyDropdown');
-            const act = document.getElementById('actionMenu');
-
-            if (!e.target.closest('.menu-container')) menu.classList.remove('show');
-            if (!e.target.closest('.history-container')) hist.classList.remove('show');
-            if (!e.target.closest('.action-wrapper')) act.classList.remove('show');
+            if (!e.target.closest('.menu-container') && !e.target.closest('.action-wrapper')) {
+                document.getElementById('menuDropdown').classList.remove('show');
+                document.getElementById('actionMenu').classList.remove('show');
+                document.getElementById('menuBackdrop').classList.remove('show');
+            }
+            if (!e.target.closest('.history-container')) {
+                document.getElementById('historyDropdown').classList.remove('show');
+            }
         });
 
+        function closeAllMenus() {
+            document.getElementById('menuDropdown').classList.remove('show');
+            document.getElementById('actionMenu').classList.remove('show');
+            document.getElementById('historyDropdown').classList.remove('show');
+            document.getElementById('menuBackdrop').classList.remove('show');
+        }
+
         function toggleMenu() {
-            document.getElementById('menuDropdown').classList.toggle('show');
+            const menu = document.getElementById('menuDropdown');
+            const backdrop = document.getElementById('menuBackdrop');
+            const isOpen = menu.classList.contains('show');
+            
+            if (isOpen) {
+                menu.classList.remove('show');
+                backdrop.classList.remove('show');
+            } else {
+                menu.classList.add('show');
+                backdrop.classList.add('show');
+                document.getElementById('actionMenu').classList.remove('show');
+                document.getElementById('historyDropdown').classList.remove('show');
+            }
         }
 
         function toggleHistory() {
-            document.getElementById('historyDropdown').classList.toggle('show');
+            const hist = document.getElementById('historyDropdown');
+            const isOpen = hist.classList.contains('show');
+            
+            if (isOpen) {
+                hist.classList.remove('show');
+            } else {
+                hist.classList.add('show');
+                document.getElementById('menuDropdown').classList.remove('show');
+                document.getElementById('actionMenu').classList.remove('show');
+                document.getElementById('menuBackdrop').classList.remove('show');
+            }
         }
 
         function toggleActionMenu(e) {
             e.stopPropagation();
-            document.getElementById('actionMenu').classList.toggle('show');
+            const act = document.getElementById('actionMenu');
+            const isOpen = act.classList.contains('show');
+            
+            if (isOpen) {
+                act.classList.remove('show');
+            } else {
+                act.classList.add('show');
+                document.getElementById('menuDropdown').classList.remove('show');
+                document.getElementById('historyDropdown').classList.remove('show');
+                document.getElementById('menuBackdrop').classList.remove('show');
+            }
         }
 
         function onProviderChange() {
@@ -870,8 +976,8 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             localStorage.setItem('aira_key_' + provider, key);
             showBadge(true, getProviderName(provider) + ' tersimpan!');
             setTimeout(function () {
-                document.getElementById('menuDropdown').classList.remove('show');
-            }, 700);
+                closeAllMenus();
+            }, 1000);
         }
 
         function showBadge(ok, text) {
@@ -907,6 +1013,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
         function newChat() {
             createNewSession();
             clearImageUpload();
+            closeAllMenus();
         }
 
         function loadSession(id) {
@@ -932,6 +1039,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             }
             renderHistoryList();
             clearImageUpload();
+            closeAllMenus();
         }
 
         function deleteSession(id, event) {
@@ -1001,7 +1109,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             document.getElementById('chatArea').innerHTML = `
                 <div class="welcome">
                     <h3>Aira AI</h3>
-                    <p>Ketuk menu di pojok kiri atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
+                    <p>Ketuk menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
                 </div>`;
         }
 
@@ -1020,14 +1128,12 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             const file = input.files[0];
             if (!file) return;
 
-            // Validasi file size
             if (file.size > CONFIG.MAX_FILE_SIZE) {
                 alert('❌ Ukuran foto maksimal 5MB!');
                 input.value = '';
                 return;
             }
 
-            // Validasi MIME type
             if (!CONFIG.ALLOWED_MIME_TYPES.includes(file.type)) {
                 alert('❌ Hanya JPG, PNG, WebP, GIF yang didukung!');
                 input.value = '';
@@ -1165,6 +1271,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
             if (!apiKey) {
                 document.getElementById('menuDropdown').classList.add('show');
+                document.getElementById('menuBackdrop').classList.add('show');
                 alert('⚠️ Silakan masukkan API key terlebih dahulu!');
                 return;
             }
@@ -1224,7 +1331,6 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
         // ==================== API CALLS ====================
         function getTruncatedHistory() {
-            // Token limit safeguard: ambil hanya last 15 messages
             const start = Math.max(0, chatHistory.length - CONFIG.MAX_HISTORY_MESSAGES);
             return chatHistory.slice(start);
         }
