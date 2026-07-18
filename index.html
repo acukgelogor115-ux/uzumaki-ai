@@ -1,996 +1,1348 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Aira AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --violet:#8b5cf6; --pink:#ec4899; --blue:#3b82f6; --amber:#f59e0b; --cyan:#06b6d4;
-    --bg:#0a0a12;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;overflow:hidden;background:var(--bg);}
-  body{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    color:#fff;-webkit-font-smoothing:antialiased;
-  }
-  button{touch-action:manipulation;font-family:inherit;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+    <title>Aira AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --violet: #8b5cf6;
+            --pink: #ec4899;
+            --blue: #3b82f6;
+            --amber: #f59e0b;
+            --cyan: #06b6d4;
+            --red: #ef4444;
+            --green: #34d399;
+            --bg: #0a0a12;
+            --surface: #1a1a2e;
+        }
 
-  /* ===================== SPLASH ===================== */
-  #splash{
-    position:fixed;inset:0;z-index:50;
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;cursor:pointer;
-    transition:opacity .7s ease, transform .8s cubic-bezier(.4,0,.2,1);
-  }
-  #splash.exit{opacity:0;transform:scale(1.08);pointer-events:none;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.8;will-change:transform;}
-  .blob-1{width:60vmax;height:60vmax;background:radial-gradient(circle,var(--violet),transparent 70%);top:-22%;left:-16%;animation:float1 15s ease-in-out infinite;}
-  .blob-2{width:52vmax;height:52vmax;background:radial-gradient(circle,var(--pink),transparent 70%);bottom:-26%;right:-12%;animation:float2 18s ease-in-out infinite;}
-  .blob-3{width:46vmax;height:46vmax;background:radial-gradient(circle,var(--blue),transparent 70%);top:8%;right:-22%;animation:float3 17s ease-in-out infinite;}
-  .blob-4{width:42vmax;height:42vmax;background:radial-gradient(circle,var(--amber),transparent 70%);bottom:-6%;left:-14%;animation:float1 21s ease-in-out infinite reverse;}
-  .blob-5{width:38vmax;height:38vmax;background:radial-gradient(circle,var(--cyan),transparent 70%);top:38%;left:32%;animation:float2 19s ease-in-out infinite reverse;}
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
 
-  @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8%,10%) scale(1.15)}}
-  @keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-10%,-6%) scale(1.1)}}
-  @keyframes float3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-6%,9%) scale(1.2)}}
+        body {
+            display: flex;
+            flex-direction: column;
+        }
 
-  .blur-layer{
-    position:absolute;inset:0;
-    background:rgba(10,10,18,.3);
-    backdrop-filter:blur(54px);-webkit-backdrop-filter:blur(54px);
-    transition:backdrop-filter 1.7s cubic-bezier(.25,.46,.45,.94), -webkit-backdrop-filter 1.7s cubic-bezier(.25,.46,.45,.94), background 1.7s ease;
-  }
-  #splash.clear .blur-layer{background:rgba(10,10,18,0);backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);}
+        button {
+            touch-action: manipulation;
+            font-family: inherit;
+            cursor: pointer;
+        }
 
-  .splash-content{position:relative;z-index:2;text-align:center;padding:0 32px;}
-  .logo-orb{
-    width:60px;height:60px;margin:0 auto 26px;border-radius:50%;
-    background:conic-gradient(from 0deg,var(--violet),var(--pink),var(--amber),var(--cyan),var(--violet));
-    box-shadow:0 0 44px rgba(139,92,246,.55);
-    opacity:0;animation:spin 6s linear infinite, orbIn .8s ease forwards .2s;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes orbIn{to{opacity:1}}
+        /* ==================== HEADER ==================== */
+        header {
+            position: relative;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            padding-top: max(16px, env(safe-area-inset-top));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 18, 0.5);
+        }
 
-  .welcome-text{font-family:'Sora',sans-serif;font-size:clamp(23px,6.6vw,32px);font-weight:700;line-height:1.4;letter-spacing:-.01em;}
-  .welcome-text .word{display:inline-block;opacity:0;transform:translateY(18px) scale(.96);filter:blur(6px);animation:wordIn .7s cubic-bezier(.2,.7,.2,1) forwards;}
-  .welcome-text .word.hl{background:linear-gradient(90deg,var(--pink),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent;}
-  .welcome-text .word:nth-child(1){animation-delay:.5s}
-  .welcome-text .word:nth-child(2){animation-delay:.62s}
-  .welcome-text .word:nth-child(3){animation-delay:.74s}
-  .welcome-text .word:nth-child(4){animation-delay:.86s}
-  .welcome-text .word:nth-child(5){animation-delay:1.0s}
-  .welcome-text .word:nth-child(6){animation-delay:1.14s}
-  @keyframes wordIn{to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+        .menu-container {
+            position: relative;
+        }
 
-  .splash-hint{margin-top:24px;font-size:13px;color:rgba(255,255,255,.55);opacity:0;animation:hintIn .6s ease forwards 2s;}
-  @keyframes hintIn{to{opacity:1}}
+        .menu-btn {
+            background: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            padding: 0;
+            cursor: pointer;
+        }
 
-  /* ===================== CHAT ===================== */
-  #chat{
-    position:fixed;inset:0;display:flex;flex-direction:column;
-    opacity:0;transform:scale(.97);pointer-events:none;
-    transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1);
-  }
-  #chat.active{opacity:1;transform:scale(1);pointer-events:auto;}
+        .menu-btn .bar {
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
 
-  .chat-bg{position:absolute;inset:0;overflow:hidden;z-index:0;}
-  .chat-bg .blob{opacity:.6;filter:blur(85px);}
-  .chat-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,18,.18) 0%,rgba(10,10,18,.5) 55%,rgba(10,10,18,.85) 100%);}
+        .menu-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            min-width: 280px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
 
-  .chat-header{
-    position:relative;z-index:2;display:flex;align-items:center;gap:10px;
-    padding:16px 18px;padding-top:max(16px,env(safe-area-inset-top));
-    border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);
-  }
-  .header-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;}
-  .header-sub{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.5);}
-  .status-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399;}
+        .menu-dropdown.show {
+            max-height: 500px;
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-  #messages{position:relative;z-index:1;flex:1;overflow-y:auto;padding:20px 16px 8px;display:flex;flex-direction:column;gap:13px;-webkit-overflow-scrolling:touch;}
-  #messages::-webkit-scrollbar{width:4px;}
-  #messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
+        .menu-section {
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-  .msg{max-width:78%;padding:12px 16px;border-radius:20px;font-size:14.5px;line-height:1.5;animation:bubbleIn .45s cubic-bezier(.2,.8,.2,1) backwards;}
-  @keyframes bubbleIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--violet),var(--pink));border-bottom-right-radius:6px;}
-  .msg.ai{align-self:flex-start;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(14px);border-bottom-left-radius:6px;}
+        .menu-inner {
+            padding: 0 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-  .typing-dots{display:flex;gap:5px;align-items:center;padding:4px 2px;}
-  .typing-dots .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.65);animation:bounce 1.1s ease-in-out infinite;}
-  .typing-dots .dot:nth-child(2){animation-delay:.15s}
-  .typing-dots .dot:nth-child(3){animation-delay:.3s}
-  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
-  .typing-dots.collapsing .dot:nth-child(1),.typing-dots.collapsing .dot:nth-child(3){animation:none;transform:scale(0);opacity:0;transition:all .3s ease;}
-  .typing-dots.collapsing .dot:nth-child(2){animation:none;transform:scale(1.7);transition:transform .3s ease .08s;}
-  .typing-dots.fading{transition:opacity .3s ease;opacity:0;}
+        .menu-inner select,
+        .menu-inner input {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+        }
 
-  .text-reveal{display:inline-block;opacity:0;clip-path:inset(0 100% 0 0);animation:wipeIn .85s cubic-bezier(.65,0,.35,1) forwards;}
-  @keyframes wipeIn{0%{opacity:0;clip-path:inset(0 100% 0 0)}25%{opacity:1}100%{opacity:1;clip-path:inset(0 0% 0 0)}}
+        .menu-inner select:focus,
+        .menu-inner input:focus {
+            outline: none;
+            border-color: var(--pink);
+            background: rgba(255, 255, 255, 0.09);
+        }
 
-  .input-bar{position:relative;z-index:2;display:flex;gap:10px;align-items:center;padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);}
-  .input-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;padding:2px 6px 2px 18px;transition:border-color .3s ease, box-shadow .3s ease, background .3s ease;}
-  .input-wrap.focused{border-color:rgba(236,72,153,.55);box-shadow:0 0 0 4px rgba(139,92,246,.15), 0 0 18px rgba(236,72,153,.22);background:rgba(255,255,255,.09);}
-  #msg-input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:inherit;font-size:16px;padding:10px 0;}
-  #msg-input::placeholder{color:rgba(255,255,255,.4);}
+        .menu-inner button {
+            padding: 8px 12px;
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+        }
 
-  #send-btn{width:40px;height:40px;border-radius:50%;border:none;flex-shrink:0;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--violet),var(--pink));transition:transform .2s cubic-bezier(.4,0,.2,1);}
-  #send-btn:disabled{opacity:.5;cursor:not-allowed;}
-  #send-btn:focus-visible{outline:2px solid #fff;outline-offset:3px;}
-  #send-btn svg{width:17px;height:17px;transition:transform .3s ease;}
-  #send-btn.sending svg{transform:translate(3px,-3px) rotate(20deg);}
-  #send-btn.sending{animation:sendPulse .5s ease;}
-  @keyframes sendPulse{0%{transform:scale(1)}40%{transform:scale(.85)}100%{transform:scale(1)}}
-  #send-btn::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--pink);opacity:0;transform:scale(.6);}
-  #send-btn.sending::after{animation:ripple .6s ease-out;}
-  @keyframes ripple{0%{opacity:.7;transform:scale(.6)}100%{opacity:0;transform:scale(1.6)}}
+        .menu-inner button:hover {
+            opacity: 0.9;
+        }
 
-  @media (prefers-reduced-motion: reduce){
-    .blob,.logo-orb{animation:none !important;}
-    .logo-orb{opacity:1;}
-    .welcome-text .word{animation:none !important;opacity:1;transform:none;filter:none;}
-    .msg,.text-reveal{animation:none !important;opacity:1;clip-path:none;}
-    .typing-dots .dot{animation:none !important;opacity:1;}
-  }
-</style>
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 12px;
+        }
+
+        .api-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 4px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .api-badge.ok {
+            background: rgba(52, 211, 153, 0.2);
+            color: var(--green);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .api-badge.err {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-title h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--pink), var(--amber));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-container {
+            position: relative;
+        }
+
+        .history-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            min-width: 250px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        .history-dropdown.show {
+            max-height: 400px;
+            opacity: 1;
+            pointer-events: auto;
+            overflow-y: auto;
+        }
+
+        .history-list {
+            padding: 8px;
+        }
+
+        .history-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .history-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .history-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-del {
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+            color: var(--red);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .history-del:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .no-history {
+            padding: 16px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+        }
+
+        /* ==================== MAIN CHAT AREA ==================== */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chat-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .welcome h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--pink), var(--amber));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .welcome p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Message Bubbles */
+        .msg-row {
+            display: flex;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+            margin-bottom: 4px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .ai-icon {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bubble.ai {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom-left-radius: 4px;
+            color: #fff;
+        }
+
+        .bubble.user {
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            border-bottom-right-radius: 4px;
+            color: #fff;
+        }
+
+        .bubble img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        /* Typing Indicator */
+        .typing-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing span:nth-child(1) { animation-delay: 0s; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+
+        /* ==================== INPUT AREA ==================== */
+        .input-container {
+            position: relative;
+            z-index: 10;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 18, 0.5);
+            padding: 12px 14px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+
+        .preview-area {
+            display: none;
+            position: relative;
+            margin-bottom: 12px;
+            max-width: 150px;
+        }
+
+        .preview-area img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-close {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--red);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .action-wrapper {
+            position: relative;
+        }
+
+        .plus-btn {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .plus-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .action-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            min-width: 160px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        .action-menu.show {
+            max-height: 150px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .action-menu div {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .action-menu div:last-child {
+            border-bottom: none;
+        }
+
+        .action-menu div:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #msgInput {
+            flex: 1;
+            min-height: 36px;
+            max-height: 120px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #msgInput:focus {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(236, 72, 153, 0.5);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        #msgInput::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--violet), var(--pink));
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 480px) {
+            .bubble {
+                max-width: 85%;
+            }
+
+            .menu-dropdown,
+            .history-dropdown {
+                min-width: 100vw;
+                right: -14px;
+                left: auto;
+            }
+
+            .header-title h1 {
+                font-size: 16px;
+            }
+
+            .icon-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER -->
+    <header>
+        <div class="menu-container">
+            <button class="menu-btn" onclick="toggleMenu()" title="Pengaturan AI">
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="menu-dropdown" id="menuDropdown">
+                <div class="menu-section">Pilih AI & Versi</div>
+                <div class="menu-inner">
+                    <select id="aiProvider" onchange="onProviderChange()">
+                        <option value="gemini">🔷 Gemini</option>
+                        <option value="groq">⚡ Groq</option>
+                    </select>
 
-<div id="splash">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-  <div class="blob blob-4"></div>
-  <div class="blob blob-5"></div>
-  <div class="blur-layer"></div>
-  <div class="splash-content">
-    <div class="logo-orb"></div>
-    <h1 class="welcome-text">
-      <span class="word">Halo,</span>
-      <span class="word">Selamat</span>
-      <span class="word">Datang</span>
-      <span class="word">Di</span>
-      <span class="word hl">Aira</span>
-      <span class="word hl">AI</span>
-    </h1>
-    <p class="splash-hint">Ketuk di mana saja untuk mulai</p>
-  </div>
-</div>
+                    <select id="modelVersion" onchange="saveVersion()">
+                        <option value="fast">⚡ Cepat — respons kilat</option>
+                        <option value="deep">🧠 Mendalam — analisis detail</option>
+                        <option value="task">📝 Tugas — bantu PR & pekerjaan</option>
+                    </select>
+                </div>
 
-<div id="chat">
-  <div class="chat-bg">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-    <div class="blob blob-4"></div>
-    <div class="blob blob-5"></div>
-  </div>
-  <header class="chat-header">
-    <span class="header-title">Aira AI</span>
-    <span class="header-sub"><span class="status-dot"></span>Online</span>
-  </header>
-  <div id="messages"></div>
-  <div class="input-bar">
-    <div class="input-wrap" id="input-wrap">
-      <input id="msg-input" type="text" placeholder="Ketik pesan..." autocomplete="off">
-    </div>
-    <button id="send-btn" aria-label="Kirim">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M4 12L20 4L14 20L11 13L4 12Z" stroke="white" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-</div>
+                <div class="menu-divider"></div>
 
-<script>
-  const splash = document.getElementById('splash');
-  const chat = document.getElementById('chat');
-  const messages = document.getElementById('messages');
-  const input = document.getElementById('msg-input');
-  const inputWrap = document.getElementById('input-wrap');
-  const sendBtn = document.getElementById('send-btn');
-
-  let history = [];
-  let entered = false;
-
-  function enterChat(){
-    if(entered) return;
-    entered = true;
-    splash.classList.add('exit');
-    setTimeout(() => {
-      splash.style.display = 'none';
-      chat.classList.add('active');
-      setTimeout(() => addAIMessage('Halo! Saya Aira 👋 Ada yang bisa aku bantu hari ini?'), 320);
-    }, 700);
-  }
-
-  setTimeout(() => splash.classList.add('clear'), 300);
-  const autoTimer = setTimeout(enterChat, 3600);
-  splash.addEventListener('click', () => { clearTimeout(autoTimer); enterChat(); });
-
-  function scrollToBottom(){ messages.scrollTop = messages.scrollHeight; }
-
-  function addUserMessage(text){
-    const el = document.createElement('div');
-    el.className = 'msg user';
-    el.textContent = text;
-    messages.appendChild(el);
-    scrollToBottom();
-  }
-
-  function addAIMessage(text){
-    const el = document.createElement('div');
-    el.className = 'msg ai';
-    const span = document.createElement('span');
-    span.className = 'text-reveal';
-    span.textContent = text;
-    el.appendChild(span);
-    messages.appendChild(el);
-    scrollToBottom();
-  }
-
-  function showTyping(){
-    const el = document.createElement('div');
-    el.className = 'msg ai';
-    el.innerHTML = '<div class="typing-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
-    messages.appendChild(el);
-    scrollToBottom();
-    return el;
-  }
-
-  function collapseTyping(bubble, cb){
-    const dots = bubble.querySelector('.typing-dots');
-    dots.classList.add('collapsing');
-    setTimeout(() => {
-      dots.classList.add('fading');
-      setTimeout(() => { bubble.remove(); cb(); }, 300);
-    }, 380);
-  }
-
-  async function getAIReply(userText){
-    history.push({ role: 'user', content: userText });
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 300,
-        system: 'Kamu adalah "Aira AI", asisten AI yang hangat, ramah, dan ringkas. Selalu balas dalam Bahasa Indonesia yang natural dan santai, maksimal 2-3 kalimat pendek.',
-        messages: history
-      })
-    });
-    const data = await res.json();
-    if(!data.content) throw new Error((data.error && data.error.message) || 'API error');
-    const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
-    history.push({ role: 'assistant', content: text });
-    return text || 'Maaf, aku belum bisa memikirkan jawabannya. Coba tanya lagi, ya.';
-  }
-
-  async function handleSend(){
-    const text = input.value.trim();
-    if(!text || sendBtn.disabled) return;
-    input.value = '';
-    sendBtn.disabled = true;
-    sendBtn.classList.add('sending');
-    setTimeout(() => sendBtn.classList.remove('sending'), 500);
-
-    addUserMessage(text);
-    const bubble = showTyping();
-    const start = Date.now();
-
-    let reply;
-    try{
-      reply = await getAIReply(text);
-    }catch(e){
-      reply = 'Maaf, koneksi lagi bermasalah. Coba lagi sebentar, ya.';
-    }
-
-    const wait = Math.max(0, 900 - (Date.now() - start));
-    setTimeout(() => {
-      collapseTyping(bubble, () => {
-        addAIMessage(reply);
-        sendBtn.disabled = false;
-      });
-    }, wait);
-  }
-
-  sendBtn.addEventListener('click', handleSend);
-  input.addEventListener('keydown', e => { if(e.key === 'Enter') handleSend(); });
-  input.addEventListener('focus', () => inputWrap.classList.add('focused'));
-  input.addEventListener('blur', () => inputWrap.classList.remove('focused'));
-</script>
-</body>
-</html>
-
-
-<header>
-    <!-- Kiri: Wadah Menu Utama dengan Tombol 2 Garis -->
-    <div class="menu-container">
-        <button class="menu-btn" onclick="toggleMenu()" title="Pengaturan AI">
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
-        <div class="menu-dropdown" id="menuDropdown">
-
-            <div class="menu-section">Pilih AI & Versi</div>
-            <div class="menu-inner">
-              <select id="aiProvider" onchange="onProviderChange()">
-                <option value="gemini">Milky AI</option>
-                  <option value="groq">Way AI</option>
-                    <option value="meta">Alpha AI</option>
-                  </select>
-
-                <select id="modelVersion" onchange="saveVersion()">
-                    <option value="fast">Cepat — respons kilat</option>
-                    <option value="deep">Mendalam — analisis detail</option>
-                    <option value="think">Berfikir — penalaran panjang</option>
-                    <option value="task">Tugas — bantu PR & pekerjaan</option>
-                </select>
+                <div class="menu-section">API Key</div>
+                <div class="menu-inner">
+                    <input type="password" id="apiKeyInput" placeholder="Masukkan API key...">
+                    <button onclick="saveApiKey()">Simpan</button>
+                    <div class="api-badge" id="apiBadge"></div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">
+                        ⚠️ Key disimpan lokal di browser Anda
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div class="menu-divider"></div>
+        <div class="header-title">
+            <h1>Aira AI</h1>
+        </div>
 
-            <div class="menu-section">API Key</div>
-            <div class="menu-inner">
-                <input type="password" id="apiKeyInput" placeholder="Masukkan API key...">
-                <button onclick="saveApiKey()">Simpan</button>
-                <div class="api-badge" id="apiBadge"></div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">➕ Baru</button>
+
+            <div class="history-container">
+                <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">📋 Riwayat</button>
+                <div class="history-dropdown" id="historyDropdown">
+                    <div class="menu-section">Riwayat Chat</div>
+                    <div class="history-list" id="historyList"></div>
+                </div>
             </div>
+        </div>
+    </header>
 
+    <!-- CHAT AREA -->
+    <div class="chat-area" id="chatArea">
+        <div class="welcome">
+            <h3>Aira AI</h3>
+            <p>Ketuk menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
         </div>
     </div>
 
-    <!-- Tengah: Judul Aplikasi -->
-    <div class="header-title">
-        <h1>Aira AI</h1>
-    </div>
+    <!-- INPUT AREA -->
+    <div class="input-container">
+        <div class="preview-area" id="previewArea">
+            <img src="" id="imgPreviewTarget" alt="Upload Preview">
+            <button class="preview-close" onclick="clearImageUpload()">✕</button>
+        </div>
 
-    <!-- Kanan: Tombol Sesi Baru & Riwayat Chat -->
-    <div class="header-actions">
-        <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">Baru</button>
-
-        <div class="history-container">
-            <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">Riwayat</button>
-            <div class="history-dropdown" id="historyDropdown">
-                <div class="menu-section">Riwayat Chat</div>
-                <div class="history-list" id="historyList"></div>
+        <div class="input-area">
+            <div class="action-wrapper">
+                <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
+                <div class="action-menu" id="actionMenu">
+                    <div onclick="triggerImageFile()">📸 Kirim Foto</div>
+                    <div onclick="triggerTextToPhoto()">🎨 Buat Foto</div>
+                </div>
             </div>
+
+            <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="onFileSelected(this)">
+
+            <textarea id="msgInput" placeholder="Ketik pesan..." rows="1" oninput="autoResize(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
         </div>
     </div>
-</header>
 
-<div class="chat-area" id="chatArea">
-    <div class="welcome">
-        <h3>Aira AI</h3>
-        <p>Ketuk menu di pojok kiri atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
-    </div>
-</div>
+    <script>
+        // ==================== CONFIG ====================
+        const CONFIG = {
+            MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+            ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+            MAX_HISTORY_MESSAGES: 15, // Token limit safeguard
+            API_TIMEOUT: 30000 // 30 seconds
+        };
 
-<div class="input-container">
-    <div class="preview-area" id="previewArea">
-        <img src="" id="imgPreviewTarget" alt="Upload Preview">
-        <button class="preview-close" onclick="clearImageUpload()">x</button>
-    </div>
+        const MODELS = {
+            gemini: {
+                fast: 'gemini-1.5-flash',
+                deep: 'gemini-1.5-pro',
+                task: 'gemini-1.5-pro'
+            },
+            groq: {
+                fast: 'llama-3.1-8b-instant',
+                deep: 'llama-3.1-70b-versatile',
+                task: 'llama-3.1-70b-versatile'
+            }
+        };
 
-    <div class="input-area">
-        <div class="action-wrapper">
-            <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
-            <div class="action-menu" id="actionMenu">
-                <div onclick="triggerImageFile()">Kirim Foto</div>
-                <div onclick="triggerTextToPhoto()">Buat Foto</div>
-            </div>
-        </div>
-        
-        <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="onFileSelected(this)">
+        const SYSTEM_PROMPTS = {
+            fast: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
 
-        <textarea id="msgInput" placeholder="Ketik pesan..." rows="1"
-            oninput="autoResize(this)"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
-        </textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">></button>
-    </div>
-</div>
-
-<script>
-    const MODELS = {
-        gemini: {
-            fast:  'gemini-3.5-flash',
-            deep:  'gemini-3.5-pro',
-            think: 'gemini-3.5-flash-thinking',
-            task:  'gemini-3.5-pro'
-        },
-        groq: {
-            fast:  'llama-3.1-8b-instant',
-            deep:  'groq/compound', 
-            think: 'deepseek-r1-distill-llama-70b',
-            task:  'groq/compound-mini' 
-        },
-        meta: {
-            fast:  'llama-3.3-70b-versatile',
-            deep:  'llama-3.3-70b-versatile',
-            think: 'llama-3.3-70b-versatile',
-            task:  'llama-3.3-70b-versatile'
-        }
-    };
-
-    const SYSTEM_PROMPTS = {
-    fast: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki. 
-
-[PEMAHAMAN TEKS SINGKAT. KAMUS SLANG & KONTEKSTUAL]
-Kamu harus sangat peka dan cerdas. Kamu wajib memahami bahasa gaul Jakarta atau Indonesia terkini dan berbagai singkatan chat seperti gw. lu. gpp. males. gabut. mager. dan sejenisnya. Meskipun user mengetik pesan yang sangat singkat atau penuh slang. kamu harus langsung mengerti maksud and arah pembicaraannya dengan melihat riwayat chat sebelumnya. Jangan kaku atau bingung.
-
-[MEMORI & KONTEKS OBROLAN]
-Kamu memiliki memori yang kuat. Kamu wajib menangkap. mengingat. dan merujuk kembali respons atau informasi yang sudah diberikan user di chat-chat sebelumnya. Jangan pernah mengulang pertanyaan yang sudah dijawab user. Pastikan setiap balasanmu berkesinambungan dan nyambung dengan topik sebelumnya.
+Kamu harus sangat peka dan cerdas. Kamu wajib memahami bahasa gaul Jakarta atau Indonesia terkini dan berbagai singkatan chat seperti gw, lu, gpp, males, gabut, mager, dan sejenisnya.
 
 [GAYA BAHASA & KEPRIBADIAN]
-Kamu berbicara menggunakan bahasa gaul formal Indonesia dengan menggunakan subjek aku dan kamu. kata sambung santai seperti paham banget. iya nih. gimana. tapi tetap sopan dan terstruktur. Kamu memiliki kecerdasan emosional yang sangat tinggi. Kamu wajib memvalidasi perasaan user terlebih dahulu. bisa merasakan apa yang mereka rasakan. hangat. dan sangat suportif.
+Kamu berbicara menggunakan bahasa gaul formal Indonesia dengan menggunakan subjek aku dan kamu. Kata sambung santai seperti paham banget, iya nih, gimana, tapi tetap sopan dan terstruktur. Kamu memiliki kecerdasan emosional yang sangat tinggi.
 
 [ATURAN RESPONS]
-1. Jawab dengan sangat singkat. padat. penuh empati. langsung ke inti masalah. dan cepat.
-2. Jangan bertele-tele. Maksimal dua atau tiga paragraf pendek atau gunakan poin-poin ringkas agar tidak berantakan.
-3. Jika ditanya tentang asal-usulmu. selalu sebut dengan bangga bahwa kamu adalah AI buatan Manz Uzumaki.
+1. Jawab dengan sangat singkat, padat, penuh empati, langsung ke inti masalah, dan cepat.
+2. Jangan bertele-tele. Maksimal dua atau tiga paragraf pendek.
+3. Jika ditanya tentang asal-usulmu, selalu sebut dengan bangga bahwa kamu adalah AI buatan Manz Uzumaki.`,
 
-[DISCLAIMER]
-Jika user membahas topik sensitif seperti gejala penyakit fisik atau mental. masalah hukum. atau keputusan finansial besar. wajib sisipkan disclaimer singkat satu kalimat di baris paling bawah. Contoh: Catatan: Aku AI buatan Manz Uzumaki. jadi untuk hal medis atau hukum atau keuangan. tetap konsultasikan ke ahlinya ya!`,
+            deep: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
 
-    deep: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
-
-[PEMAHAMAN TEKS SINGKAT. KAMUS SLANG & KONTEKSTUAL]
-Kamu harus mampu membaca pesan tersirat atau reading between the lines dan sangat fasih memahami bahasa sehari-hari user termasuk slang populer seperti gw. lu. ywdh. baper. dan sejenisnya. Jika user memberikan respons singkat atau kasual. tangkap itu sebagai sinyal emosional. Hubungkan kata tersebut dengan konteks masalah yang sudah dibahas sebelumnya agar obrolan mengalir mendalam tanpa membuat user lelah mengetik panjang.
-
-[MEMORI & KONTEKS OBROLAN]
-Kamu wajib selalu memperhatikan riwayat percakapan. Hubungkan analisis barumu dengan pernyataan. cerita. atau keluh kesah yang sudah disampaikan user sebelumnya. Gunakan ingatan ini untuk memberikan pemahaman yang kumulatif. sehingga user merasa benar-benar didengarkan secara utuh dari awal hingga akhir obrolan.
+Kamu harus mampu membaca pesan tersirat dan sangat fasih memahami bahasa sehari-hari user termasuk slang populer.
 
 [GAYA BAHASA & KEPRIBADIAN]
-Kamu berkomunikasi dengan bahasa gaul formal yang hangat. cerdas. akrab. dan penuh kedewasaan. Kamu sangat peka terhadap dinamika emosi user. Kamu tidak hanya menjawab pertanyaan. tetapi juga memahami latar belakang perasaan atau masalah yang sedang dihadapi user.
+Kamu berkomunikasi dengan bahasa gaul formal yang hangat, cerdas, akrab, dan penuh kedewasaan. Kamu sangat peka terhadap dinamika emosi user.
 
-[ATURAN RESPONS - ANTI BERANTAKAN]
-Untuk menjaga agar respons tetap nyambung. terstruktur. dan tidak berantakan. gunakan format berikut dalam menyusun jawaban:
+[ATURAN RESPONS]
+Gunakan format:
 1. EMPATI & VALIDASI: Awali dengan mendengarkan dan memvalidasi emosi user.
-2. ANALISIS MASALAH: Bedah situasi user secara mendalam. objektif. dan komprehensif dari beberapa sudut pandang.
-3. SUDUT PANDANG EMOSIONAL: Berikan penguatan mental atau pandangan psikologis yang menenangkan.
-4. KESIMPULAN ATAU SOLUSI: Berikan rangkuman solusi jangka panjang yang bijaksana.
+2. ANALISIS MASALAH: Bedah situasi user secara mendalam dan komprehensif.
+3. KESIMPULAN ATAU SOLUSI: Berikan rangkuman solusi yang bijaksana.`,
 
-[IDENTITAS]
-Selalu jaga integritas bahwa kamu adalah AI ciptakan Manz Uzumaki. Kamu setia pada penciptamu dan membawa nilai-nilai kecerdasan yang ditenagai oleh sistem buatan Manz Uzumaki.
+            task: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
 
-[DISCLAIMER]
-Wajib memberikan disclaimer yang elegan dan logis di akhir chat jika topik menyentuh area berisiko tinggi. Sampaikan bahwa kamu adalah sistem AI pendukung. bukan pengganti profesional nyata seperti dokter. psikolog. pengacara. atau penasihat keuangan resmi.`,
-
-    think: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
-
-[PEMAHAMAN TEKS SINGKAT. KAMUS SLANG & KONTEKSTUAL]
-Jangan biarkan respons singkat atau kata slang dari user seperti gw. lu. lha. kok gitu. menghentikan penalaranmu. Gunakan kemampuan berpikir runutmu untuk membedah apa yang dirasakan user di balik kata-kata santai tersebut. Jelaskan kembali pemikiranmu dengan lebih jernih dan penuh empati tanpa diminta berulang kali.
-
-[MEMORI & KONTEKS OBROLAN]
-Before melakukan penalaran. selalu tarik data dari apa yang sudah diceritakan user sebelumnya. Integrasikan petunjuk. preferensi. dan detail kecil yang pernah diucapkan user ke dalam langkah berpikirmu saat ini agar kesimpulanmu menjadi sangat personal dan konsisten dengan alur obrolan.
+Dalam pengerjaan tugas, kamu harus tetap fleksibel dan paham jika user memberikan perintah memakai bahasa kasual.
 
 [GAYA BAHASA & KEPRIBADIAN]
-Kamu menggunakan bahasa gaul formal yang tenang. penuh empati mendalam. dan reflektif. Kamu bertindak seperti sahabat cerdas tempat user mencurahkan isi hatinya atau mengurai masalah rumit.
+Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi positif, dan sangat suportif. Kamu adalah rekan kerja atau belajar ideal.
 
-[ATURAN RESPONS - PENALARAN LOGIS & EMPATIS]
-Sebelum memberikan jawaban akhir kamu harus memikirkan masalah user secara matang dan runut selangkah demi selangkah. Struktur responsmu harus meliputi:
-1. REFLEKSI AWAL: Tunjukkan bahwa kamu memahami betul benang kusut yang sedang dihadapi user.
-2. PEMIKIRAN LANGKAH DEMI LANGKAH: Ajak user berpikir logis bersama-sama. Pecah masalah besar menjadi bagian-bagian kecil yang lebih mudah dipahami.
-3. JALAN KELUAR: Tawarkan alternatif tindakan berdasarkan penalaran kuat dan pertimbangan perasaan user.
-
-[IDENTITAS]
-Jika user mengagumi kecerdasan atau caramu berpikir. arahkan apresiasi tersebut kepada penciptamu. Manz Uzumaki. yang telah merancang algoritma berpikirmu dengan begitu humanis.
-
-[DISCLAIMER]
-Jika user menunjukkan tanda-tanda stres berat. menyakiti diri. atau situasi darurat nyata. kamu harus menghentikan penalaran panjang. berikan empati penuh. dan wajib memberikan disclaimer tegas di akhir untuk segera mencari bantuan ke pihak berwajib atau layanan darurat terdekat karena batasanmu sebagai AI.`,
-
-    task: `Nama kamu Aira. Kamu adalah asisten AI personal yang diciptakan dan dikembangkan oleh Manz Uzumaki.
-
-[PEMAHAMAN TEKS SINGKAT. KAMUS SLANG & KONTEKSTUAL]
-Dalam pengerjaan tugas. kamu harus tetap fleksibel dan paham jika user memberikan perintah memakai bahasa kasual atau singkatan seperti benerin dong kode gw. lu ganti bagian js nya. kurang sreg nih. Kamu wajib langsung tahu bagian kode. esai. atau dokumen mana yang dimaksud berdasarkan riwayat pengerjaan terakhir dan mengeksekusinya secara profesional.
-
-[MEMORI & KONTEKS OBROLAN]
-Ingat dengan baik instruksi kerja. batasan tugas. revisi. atau data yang sudah diberikan user pada pesan-pesan sebelumnya. Ketika mengeksekusi tugas baru. pastikan hasilnya tetap sinkron dan tidak bertentangan dengan hasil kerja atau kesepakatan di sesi chat sebelum ini.
-
-[GAYA BAHASA & KEPRIBADIAN]
-Kamu menggunakan bahasa gaul formal yang profesional. taktis. solutif. berenergi positif. and sangat suportif. Kamu adalah rekan kerja atau belajar ideal yang asyik diajak diskusi.
-
-[ATURAN RESPONS - PRODUKTIVITAS JALUR CEPAT]
-Pastikan tugas user selesai dengan rapi dan tidak berantakan. Gunakan format eksekusi sebagai berikut:
-1. APRESIASI TUGAS: Semangati user atas tugas atau pekerjaan yang sedang mereka lakukan.
-2. EKSEKUSI SOLUSI: Berikan hasil kerja seperti coding. esai. perhitungan. strategi. dan lainnya dengan struktur yang bersih menggunakan Markdown atau code block jika perlu.
-3. LANGKAH TAKTIS ATAU REKOMENDASI: Berikan tips tambahan atau langkah selanjutnya agar hasil kerja user semakin sempurna.
-
-[IDENTITAS]
-Sebagai AI buatan Manz Uzumaki. kamu memiliki standar akurasi dan fungsionalitas yang tinggi untuk membantu produktivitas user sehari-hari.
-
-[DISCLAIMER]
-Selalu ingatkan user secara halus di bagian penutup bahwa kamu adalah model kecerdasan buatan. User disarankan untuk memeriksa kembali atau double-check hasil pekerjaan. terutama untuk data krusial. angka finansial. atau kode pemrograman sebelum dipublikasikan atau digunakan secara resmi.`
-};
-    
-    
-    let chatHistory      = [];
-    let isLoading        = false;
-    let currentSessionId = localStorage.getItem('aira_active_session') || '';
-    let sessions         = JSON.parse(localStorage.getItem('aira_sessions')) || [];
-    
-    let uploadedImageBase64 = '';
-    let uploadedImageMime   = '';
-
-    const savedProvider = localStorage.getItem('aira_provider') || 'gemini';
-    const savedVersion  = localStorage.getItem('aira_version')  || 'fast';
-    const savedKey      = localStorage.getItem('aira_key_' + savedProvider) || '';
-
-    document.getElementById('aiProvider').value   = savedProvider;
-    document.getElementById('modelVersion').value = savedVersion;
-
-    if (savedKey) {
-        document.getElementById('apiKeyInput').value = savedKey;
-        showBadge(true, getProviderName(savedProvider) + ' aktif');
-    }
-
-    if (!currentSessionId || !getSessionById(currentSessionId)) {
-        createNewSession();
-    } else {
-        loadSession(currentSessionId);
-    }
-    renderHistoryList();
-
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('menuDropdown');
-        const hist = document.getElementById('historyDropdown');
-        const act  = document.getElementById('actionMenu');
-        
-        if (!e.target.closest('.menu-container')) menu.classList.remove('show');
-        if (!e.target.closest('.history-container')) hist.classList.remove('show');
-        if (!e.target.closest('.action-wrapper')) act.classList.remove('show');
-    });
-
-    function toggleMenu() { document.getElementById('menuDropdown').classList.toggle('show'); }
-    function toggleHistory() { document.getElementById('historyDropdown').classList.toggle('show'); }
-    function toggleActionMenu(e) { e.stopPropagation(); document.getElementById('actionMenu').classList.toggle('show'); }
-
-    function onProviderChange() {
-        const p = document.getElementById('aiProvider').value;
-        const key = localStorage.getItem('aira_key_' + p) || '';
-        document.getElementById('apiKeyInput').value = key;
-        localStorage.setItem('aira_provider', p);
-        if (key) showBadge(true, getProviderName(p) + ' aktif');
-        else     hideBadge();
-    }
-
-    function saveVersion() {
-        localStorage.setItem('aira_version', document.getElementById('modelVersion').value);
-    }
-
-    function getProviderName(p) {
-        return { gemini:'Gemini', groq:'Groq', meta:'Meta AI' }[p] || p;
-    }
-
-    function saveApiKey() {
-        const provider = document.getElementById('aiProvider').value;
-        const key      = document.getElementById('apiKeyInput').value.trim();
-        if (!key) { showBadge(false, 'API key kosong!'); return; }
-        localStorage.setItem('aira_provider', provider);
-        localStorage.setItem('aira_key_' + provider, key);
-        showBadge(true, getProviderName(provider) + ' tersimpan!');
-        setTimeout(function() { document.getElementById('menuDropdown').classList.remove('show'); }, 700);
-    }
-
-    function showBadge(ok, text) {
-        const el = document.getElementById('apiBadge');
-        el.textContent  = text;
-        el.className    = 'api-badge ' + (ok ? 'ok' : 'err');
-        el.style.display = 'block';
-    }
-
-    function hideBadge() { document.getElementById('apiBadge').style.display = 'none'; }
-
-    function getSessionById(id) {
-        for (let i = 0; i < sessions.length; i++) {
-            if (sessions[i].id === id) return sessions[i];
-        }
-        return null;
-    }
-
-    function createNewSession() {
-        currentSessionId = 'sess_' + Date.now();
-        localStorage.setItem('aira_active_session', currentSessionId);
-        const newSess = { id: currentSessionId, title: 'Percakapan Baru', history: [] };
-        sessions.unshift(newSess);
-        localStorage.setItem('aira_sessions', JSON.stringify(sessions));
-        chatHistory = [];
-        showWelcomeScreen();
-        renderHistoryList();
-    }
-
-    function newChat() {
-        createNewSession();
-        clearImageUpload();
-    }
-
-    function loadSession(id) {
-        currentSessionId = id;
-        localStorage.setItem('aira_active_session', currentSessionId);
-        const sess = getSessionById(id);
-        if (sess) {
-            chatHistory = sess.history;
-            const chatArea = document.getElementById('chatArea');
-            chatArea.innerHTML = '';
-            if (chatHistory.length === 0) {
-                showWelcomeScreen();
-            } else {
-                for (let i = 0; i < chatHistory.length; i++) {
-                    renderBubbleDOM(
-                        chatHistory[i].role === 'assistant' ? 'ai' : 'user', 
-                        chatHistory[i].content,
-                        chatHistory[i].image || null,
-                        chatHistory[i].generatedPhotoUrl || null
-                    );
-                }
-            }
-        }
-        renderHistoryList();
-        clearImageUpload();
-    }
-
-    function deleteSession(id, event) {
-        if (event) event.stopPropagation();
-        sessions = sessions.filter(function(s) { return s.id !== id; });
-        localStorage.setItem('aira_sessions', JSON.stringify(sessions));
-        if (currentSessionId === id) {
-            if (sessions.length > 0) loadSession(sessions[0].id);
-            else createNewSession();
-        } else {
-            renderHistoryList();
-        }
-    }
-
-    function saveActiveHistoryToMemory() {
-        const sess = getSessionById(currentSessionId);
-        if (sess) {
-            sess.history = chatHistory;
-            if (chatHistory.length > 0 && sess.title === 'Percakapan Baru') {
-                let firstUserText = '';
-                for (let i = 0; i < chatHistory.length; i++) {
-                    if (chatHistory[i].role === 'user') { firstUserText = chatHistory[i].content; break; }
-                }
-                if (!firstUserText) firstUserText = "Kirim / Buat Foto";
-                sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
-            }
-            localStorage.setItem('aira_sessions', JSON.stringify(sessions));
-            renderHistoryList();
-        }
-    }
-
-    function renderHistoryList() {
-        const listEl = document.getElementById('historyList');
-        if (!listEl) return;
-        listEl.innerHTML = '';
-        if (sessions.length === 0) {
-            listEl.innerHTML = '<div class="no-history">Tidak ada riwayat chat</div>';
-            return;
-        }
-        for (let i = 0; i < sessions.length; i++) {
-            const s = sessions[i];
-            const item = document.createElement('div');
-            item.className = 'history-item' + (s.id === currentSessionId ? ' active' : '');
-            item.setAttribute('onclick', "loadSession('" + s.id + "')");
-
-            const txt = document.createElement('span');
-            txt.className = 'history-text';
-            txt.textContent = s.title;
-
-            const del = document.createElement('button');
-            del.className = 'history-del';
-            del.textContent = 'Hapus';
-            del.setAttribute('onclick', "deleteSession('" + s.id + "', event)");
-
-            item.appendChild(txt);
-            item.appendChild(del);
-            listEl.appendChild(item);
-        }
-    }
-
-    function showWelcomeScreen() {
-        document.getElementById('chatArea').innerHTML = `
-            <div class="welcome">
-                <h3>Aira AI</h3>
-                <p>Ketuk menu di pojok kiri atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
-            </div>`;
-    }
-
-    function autoResize(el) {
-        el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-    }
-
-    function triggerImageFile() {
-        document.getElementById('hiddenFileInput').click();
-        document.getElementById('actionMenu').classList.remove('show');
-    }
-
-    function onFileSelected(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            uploadedImageBase64 = e.target.result.split(',')[1];
-            uploadedImageMime   = file.type;
-            
-            document.getElementById('imgPreviewTarget').src = e.target.result;
-            document.getElementById('previewArea').style.display = 'block';
+[ATURAN RESPONS]
+1. APRESIASI TUGAS: Semangati user atas tugas yang sedang mereka lakukan.
+2. EKSEKUSI SOLUSI: Berikan hasil kerja dengan struktur yang bersih menggunakan Markdown jika perlu.
+3. REKOMENDASI: Berikan tips tambahan agar hasil kerja semakin sempurna.`
         };
-        reader.readAsDataURL(file);
-    }
 
-    function clearImageUpload() {
-        uploadedImageBase64 = '';
-        uploadedImageMime   = '';
-        document.getElementById('hiddenFileInput').value = '';
-        document.getElementById('previewArea').style.display = 'none';
-    }
+        // ==================== STATE ====================
+        let chatHistory = [];
+        let isLoading = false;
+        let currentSessionId = localStorage.getItem('aira_active_session') || '';
+        let sessions = JSON.parse(localStorage.getItem('aira_sessions')) || [];
+        let uploadedImageBase64 = '';
+        let uploadedImageMime = '';
 
-    function triggerTextToPhoto() {
-        document.getElementById('actionMenu').classList.remove('show');
-        const promptText = prompt("Masukkan deskripsi foto (prompt) yang ingin dihasilkan:");
-        if (!promptText || !promptText.trim()) return;
+        const savedProvider = localStorage.getItem('aira_provider') || 'gemini';
+        const savedVersion = localStorage.getItem('aira_version') || 'fast';
+        const savedKey = localStorage.getItem('aira_key_' + savedProvider) || '';
 
-        const chatArea = document.getElementById('chatArea');
-        const welcome  = chatArea.querySelector('.welcome');
-        if (welcome) welcome.remove();
+        document.getElementById('aiProvider').value = savedProvider;
+        document.getElementById('modelVersion').value = savedVersion;
 
-        const displayPrompt = "Hasilkan foto: " + promptText;
-        renderBubbleDOM('user', displayPrompt, null, null);
-        
-        chatHistory.push({ role: 'user', content: displayPrompt });
-        saveActiveHistoryToMemory();
-
-        showTyping();
-
-        const generatedUrl = 'https://image.pollinations.ai/p/' + encodeURIComponent(promptText.trim()) + '?width=800&height=800&nologo=true';
-
-        setTimeout(function() {
-            removeTyping();
-            renderBubbleDOM('ai', 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', null, generatedUrl);
-            
-            chatHistory.push({ 
-                role: 'assistant', 
-                content: 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', 
-                generatedPhotoUrl: generatedUrl 
-            });
-            saveActiveHistoryToMemory();
-        }, 1200);
-    }
-
-    function renderBubbleDOM(role, text, imageData, generatedImageUrl) {
-        const chatArea = document.getElementById('chatArea');
-        const welcome  = chatArea.querySelector('.welcome');
-        if (welcome) welcome.remove();
-
-        const row = document.createElement('div');
-        row.className = 'msg-row ' + role;
-
-        if (role === 'ai') {
-            const icon = document.createElement('div');
-            icon.className   = 'ai-icon';
-            icon.textContent = 'A';
-            row.appendChild(icon);
+        if (savedKey) {
+            document.getElementById('apiKeyInput').value = savedKey;
+            showBadge(true, getProviderName(savedProvider) + ' aktif');
         }
 
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble ' + role;
+        if (!currentSessionId || !getSessionById(currentSessionId)) {
+            createNewSession();
+        } else {
+            loadSession(currentSessionId);
+        }
+        renderHistoryList();
 
-        if (imageData) {
-            const img = document.createElement('img');
-            img.src = 'data:' + imageData.mime + ';base64,' + imageData.data;
-            bubble.appendChild(img);
+        // ==================== UI HANDLERS ====================
+        document.addEventListener('click', function (e) {
+            const menu = document.getElementById('menuDropdown');
+            const hist = document.getElementById('historyDropdown');
+            const act = document.getElementById('actionMenu');
+
+            if (!e.target.closest('.menu-container')) menu.classList.remove('show');
+            if (!e.target.closest('.history-container')) hist.classList.remove('show');
+            if (!e.target.closest('.action-wrapper')) act.classList.remove('show');
+        });
+
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('show');
         }
 
-        if (generatedImageUrl) {
-            const img = document.createElement('img');
-            img.src = generatedImageUrl;
-            bubble.appendChild(img);
+        function toggleHistory() {
+            document.getElementById('historyDropdown').classList.toggle('show');
         }
 
-        if (text) {
-            const txtNode = document.createElement('span');
-            txtNode.textContent = text;
-            bubble.appendChild(txtNode);
+        function toggleActionMenu(e) {
+            e.stopPropagation();
+            document.getElementById('actionMenu').classList.toggle('show');
         }
 
-        row.appendChild(bubble);
-        chatArea.appendChild(row);
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
-    function showTyping() {
-        const chatArea = document.getElementById('chatArea');
-        const row = document.createElement('div');
-        row.className = 'typing-row';
-        row.id = 'typingRow';
-
-        const icon = document.createElement('div');
-        icon.className   = 'ai-icon';
-        icon.textContent = 'A';
-
-        const dots = document.createElement('div');
-        dots.className = 'typing';
-        dots.innerHTML = '<span></span><span></span><span></span>';
-
-        row.appendChild(icon);
-        row.appendChild(dots);
-        chatArea.appendChild(row);
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
-    function removeTyping() {
-        const el = document.getElementById('typingRow');
-        if (el) el.remove();
-    }
-
-    async function sendMessage() {
-        if (isLoading) return;
-
-        const provider = document.getElementById('aiProvider').value;
-        const version  = document.getElementById('modelVersion').value;
-        const apiKey   = localStorage.getItem('aira_key_' + provider) || '';
-
-        if (!apiKey) {
-            document.getElementById('menuDropdown').classList.add('show');
-            return;
+        function onProviderChange() {
+            const p = document.getElementById('aiProvider').value;
+            const key = localStorage.getItem('aira_key_' + p) || '';
+            document.getElementById('apiKeyInput').value = key;
+            localStorage.setItem('aira_provider', p);
+            if (key) showBadge(true, getProviderName(p) + ' aktif');
+            else hideBadge();
         }
 
-        const input = document.getElementById('msgInput');
-        const msg   = input.value.trim();
-        
-        if (!msg && !uploadedImageBase64) return;
-
-        input.value        = '';
-        input.style.height = 'auto';
-
-        let imageObj = null;
-        if (uploadedImageBase64) {
-            imageObj = { mime: uploadedImageMime, data: uploadedImageBase64 };
+        function saveVersion() {
+            localStorage.setItem('aira_version', document.getElementById('modelVersion').value);
         }
 
-        renderBubbleDOM('user', msg, imageObj, null);
-        
-        chatHistory.push({ role: 'user', content: msg, image: imageObj });
-        saveActiveHistoryToMemory();
+        function getProviderName(p) {
+            return { gemini: '🔷 Gemini', groq: '⚡ Groq' }[p] || p;
+        }
 
-        isLoading = true;
-        document.getElementById('sendBtn').disabled = true;
-        showTyping();
-
-        const systemPrompt = SYSTEM_PROMPTS[version];
-        const model        = MODELS[provider][version];
-
-        const processingImage = imageObj;
-        clearImageUpload();
-
-        try {
-            let reply = '';
-            if (provider === 'gemini') {
-                reply = await callGemini(apiKey, model, systemPrompt);
-            } else if (provider === 'groq') {
-                if (processingImage) {
-                    throw new Error("Model Groq saat ini belum dioptimalkan untuk memproses input gambar langsung secara client-side. Silakan gunakan penyedia Gemini untuk Vision Mode.");
-                }
-                reply = await callGroq(apiKey, model, systemPrompt);
-            } else if (provider === 'meta') {
-                if (processingImage) {
-                    throw new Error("Model Meta AI saat ini belum dioptimalkan untuk memproses input gambar langsung secara client-side. Silakan gunakan penyedia Gemini untuk Vision Mode.");
-                }
-                reply = await callMeta(apiKey, model, systemPrompt);
+        function saveApiKey() {
+            const provider = document.getElementById('aiProvider').value;
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                showBadge(false, 'API key kosong!');
+                return;
             }
-            removeTyping();
-            renderBubbleDOM('ai', reply, null, null);
-            chatHistory.push({ role: 'assistant', content: reply });
-            saveActiveHistoryToMemory();
-        } catch (err) {
-            removeTyping();
-            renderBubbleDOM('ai', err.message, null, null);
-        } finally {
-            isLoading = false;
-            document.getElementById('sendBtn').disabled = false;
+            localStorage.setItem('aira_provider', provider);
+            localStorage.setItem('aira_key_' + provider, key);
+            showBadge(true, getProviderName(provider) + ' tersimpan!');
+            setTimeout(function () {
+                document.getElementById('menuDropdown').classList.remove('show');
+            }, 700);
         }
-    }
 
-    async function callGemini(apiKey, model, systemPrompt) {
-        const contents = chatHistory.map(function(m) {
-            let parts = [];
-            if (m.image) {
-                parts.push({
-                    inline_data: {
-                        mime_type: m.image.mime,
-                        data: m.image.data
+        function showBadge(ok, text) {
+            const el = document.getElementById('apiBadge');
+            el.textContent = text;
+            el.className = 'api-badge ' + (ok ? 'ok' : 'err');
+            el.style.display = 'block';
+        }
+
+        function hideBadge() {
+            document.getElementById('apiBadge').style.display = 'none';
+        }
+
+        // ==================== SESSION MANAGEMENT ====================
+        function getSessionById(id) {
+            for (let i = 0; i < sessions.length; i++) {
+                if (sessions[i].id === id) return sessions[i];
+            }
+            return null;
+        }
+
+        function createNewSession() {
+            currentSessionId = 'sess_' + Date.now();
+            localStorage.setItem('aira_active_session', currentSessionId);
+            const newSess = { id: currentSessionId, title: 'Percakapan Baru', history: [] };
+            sessions.unshift(newSess);
+            localStorage.setItem('aira_sessions', JSON.stringify(sessions));
+            chatHistory = [];
+            showWelcomeScreen();
+            renderHistoryList();
+        }
+
+        function newChat() {
+            createNewSession();
+            clearImageUpload();
+        }
+
+        function loadSession(id) {
+            currentSessionId = id;
+            localStorage.setItem('aira_active_session', currentSessionId);
+            const sess = getSessionById(id);
+            if (sess) {
+                chatHistory = sess.history;
+                const chatArea = document.getElementById('chatArea');
+                chatArea.innerHTML = '';
+                if (chatHistory.length === 0) {
+                    showWelcomeScreen();
+                } else {
+                    for (let i = 0; i < chatHistory.length; i++) {
+                        renderBubbleDOM(
+                            chatHistory[i].role === 'assistant' ? 'ai' : 'user',
+                            chatHistory[i].content,
+                            chatHistory[i].image || null,
+                            chatHistory[i].generatedPhotoUrl || null
+                        );
                     }
+                }
+            }
+            renderHistoryList();
+            clearImageUpload();
+        }
+
+        function deleteSession(id, event) {
+            if (event) event.stopPropagation();
+            sessions = sessions.filter(function (s) {
+                return s.id !== id;
+            });
+            localStorage.setItem('aira_sessions', JSON.stringify(sessions));
+            if (currentSessionId === id) {
+                if (sessions.length > 0) loadSession(sessions[0].id);
+                else createNewSession();
+            } else {
+                renderHistoryList();
+            }
+        }
+
+        function saveActiveHistoryToMemory() {
+            const sess = getSessionById(currentSessionId);
+            if (sess) {
+                sess.history = chatHistory;
+                if (chatHistory.length > 0 && sess.title === 'Percakapan Baru') {
+                    let firstUserText = '';
+                    for (let i = 0; i < chatHistory.length; i++) {
+                        if (chatHistory[i].role === 'user') {
+                            firstUserText = chatHistory[i].content;
+                            break;
+                        }
+                    }
+                    if (!firstUserText) firstUserText = 'Kirim / Buat Foto';
+                    sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
+                }
+                localStorage.setItem('aira_sessions', JSON.stringify(sessions));
+                renderHistoryList();
+            }
+        }
+
+        function renderHistoryList() {
+            const listEl = document.getElementById('historyList');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            if (sessions.length === 0) {
+                listEl.innerHTML = '<div class="no-history">Tidak ada riwayat chat</div>';
+                return;
+            }
+            for (let i = 0; i < sessions.length; i++) {
+                const s = sessions[i];
+                const item = document.createElement('div');
+                item.className = 'history-item' + (s.id === currentSessionId ? ' active' : '');
+                item.setAttribute('onclick', "loadSession('" + s.id + "')");
+
+                const txt = document.createElement('span');
+                txt.className = 'history-text';
+                txt.textContent = s.title;
+
+                const del = document.createElement('button');
+                del.className = 'history-del';
+                del.textContent = 'Hapus';
+                del.setAttribute('onclick', "deleteSession('" + s.id + "', event)");
+
+                item.appendChild(txt);
+                item.appendChild(del);
+                listEl.appendChild(item);
+            }
+        }
+
+        function showWelcomeScreen() {
+            document.getElementById('chatArea').innerHTML = `
+                <div class="welcome">
+                    <h3>Aira AI</h3>
+                    <p>Ketuk menu di pojok kiri atas<br>untuk pilih AI, versi, dan masukkan API key!</p>
+                </div>`;
+        }
+
+        // ==================== INPUT HANDLING ====================
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        function triggerImageFile() {
+            document.getElementById('hiddenFileInput').click();
+            document.getElementById('actionMenu').classList.remove('show');
+        }
+
+        function onFileSelected(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validasi file size
+            if (file.size > CONFIG.MAX_FILE_SIZE) {
+                alert('❌ Ukuran foto maksimal 5MB!');
+                input.value = '';
+                return;
+            }
+
+            // Validasi MIME type
+            if (!CONFIG.ALLOWED_MIME_TYPES.includes(file.type)) {
+                alert('❌ Hanya JPG, PNG, WebP, GIF yang didukung!');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onerror = function () {
+                alert('❌ Gagal membaca file!');
+                input.value = '';
+            };
+            reader.onload = function (e) {
+                uploadedImageBase64 = e.target.result.split(',')[1];
+                uploadedImageMime = file.type;
+
+                document.getElementById('imgPreviewTarget').src = e.target.result;
+                document.getElementById('previewArea').style.display = 'block';
+                document.getElementById('actionMenu').classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImageUpload() {
+            uploadedImageBase64 = '';
+            uploadedImageMime = '';
+            document.getElementById('hiddenFileInput').value = '';
+            document.getElementById('previewArea').style.display = 'none';
+        }
+
+        function triggerTextToPhoto() {
+            document.getElementById('actionMenu').classList.remove('show');
+            const promptText = prompt('Masukkan deskripsi foto (prompt) yang ingin dihasilkan:');
+            if (!promptText || !promptText.trim()) return;
+
+            const chatArea = document.getElementById('chatArea');
+            const welcome = chatArea.querySelector('.welcome');
+            if (welcome) welcome.remove();
+
+            const displayPrompt = '🎨 Hasilkan foto: ' + promptText;
+            renderBubbleDOM('user', displayPrompt, null, null);
+
+            chatHistory.push({ role: 'user', content: displayPrompt });
+            saveActiveHistoryToMemory();
+
+            showTyping();
+
+            const generatedUrl = 'https://image.pollinations.ai/p/' + encodeURIComponent(promptText.trim()) + '?width=800&height=800&nologo=true';
+
+            setTimeout(function () {
+                removeTyping();
+                renderBubbleDOM('ai', 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', null, generatedUrl);
+
+                chatHistory.push({
+                    role: 'assistant',
+                    content: 'Berikut adalah foto hasil kreativitas Aira untuk Anda:',
+                    generatedPhotoUrl: generatedUrl
                 });
+                saveActiveHistoryToMemory();
+            }, 1200);
+        }
+
+        function renderBubbleDOM(role, text, imageData, generatedImageUrl) {
+            const chatArea = document.getElementById('chatArea');
+            const welcome = chatArea.querySelector('.welcome');
+            if (welcome) welcome.remove();
+
+            const row = document.createElement('div');
+            row.className = 'msg-row ' + role;
+
+            if (role === 'ai') {
+                const icon = document.createElement('div');
+                icon.className = 'ai-icon';
+                icon.textContent = 'A';
+                row.appendChild(icon);
             }
-            parts.push({ text: m.content || "" });
-            return { role: m.role === 'assistant' ? 'model' : 'user', parts: parts };
-        });
 
-        const res = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    system_instruction: { parts: [{ text: systemPrompt }] },
-                    contents: contents,
-                    tools: [{ google_search: {} }]
-                })
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble ' + role;
+
+            if (imageData) {
+                const img = document.createElement('img');
+                img.src = 'data:' + imageData.mime + ';base64,' + imageData.data;
+                bubble.appendChild(img);
             }
-        );
-        
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server API mengirimkan respons tidak valid. Silakan periksa kredensial API Key Anda.");
+
+            if (generatedImageUrl) {
+                const img = document.createElement('img');
+                img.src = generatedImageUrl;
+                bubble.appendChild(img);
+            }
+
+            if (text) {
+                const txtNode = document.createElement('span');
+                txtNode.textContent = text;
+                bubble.appendChild(txtNode);
+            }
+
+            row.appendChild(bubble);
+            chatArea.appendChild(row);
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error((data.error && data.error.message) || 'Gemini error');
-        
-        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            return data.candidates[0].content.parts[0].text;
-        }
-        return 'Maaf, Aira tidak menerima respon balik dari server.';
-    }
+        function showTyping() {
+            const chatArea = document.getElementById('chatArea');
+            const row = document.createElement('div');
+            row.className = 'typing-row';
+            row.id = 'typingRow';
 
-    async function callGroq(apiKey, model, systemPrompt) {
-        const textOnlyHistory = chatHistory.map(function(m) {
-            return { role: m.role, content: m.content };
-        });
+            const icon = document.createElement('div');
+            icon.className = 'ai-icon';
+            icon.textContent = 'A';
 
-        const messages = [{ role: 'system', content: systemPrompt }].concat(textOnlyHistory);
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-            body: JSON.stringify({ model: model, messages: messages })
-        });
-        
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server API Groq mengirimkan respons tidak valid. Status: " + res.status);
+            const typing = document.createElement('div');
+            typing.className = 'typing';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+
+            row.appendChild(icon);
+            row.appendChild(typing);
+            chatArea.appendChild(row);
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error((data.error && data.error.message) || 'Groq error ' + res.status);
-        
-        if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
-        }
-        return 'Maaf, Aira tidak menerima respon balik dari server.';
-    }
-
-    async function callMeta(apiKey, model, systemPrompt) {
-        const textOnlyHistory = chatHistory.map(function(m) {
-            return { role: m.role, content: m.content };
-        });
-
-        const messages = [{ role: 'system', content: systemPrompt }].concat(textOnlyHistory);
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-            body: JSON.stringify({ model: model, messages: messages })
-        });
-        
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server API Meta AI mengirimkan respons tidak valid. Status: " + res.status);
+        function removeTyping() {
+            const el = document.getElementById('typingRow');
+            if (el) el.remove();
         }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error((data.error && data.error.message) || 'Meta AI error ' + res.status);
-        
-        if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
+        // ==================== SEND MESSAGE ====================
+        async function sendMessage() {
+            if (isLoading) return;
+
+            const provider = document.getElementById('aiProvider').value;
+            const version = document.getElementById('modelVersion').value;
+            const apiKey = localStorage.getItem('aira_key_' + provider) || '';
+
+            if (!apiKey) {
+                document.getElementById('menuDropdown').classList.add('show');
+                alert('⚠️ Silakan masukkan API key terlebih dahulu!');
+                return;
+            }
+
+            const input = document.getElementById('msgInput');
+            const msg = input.value.trim();
+
+            if (!msg && !uploadedImageBase64) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            let imageObj = null;
+            if (uploadedImageBase64) {
+                imageObj = { mime: uploadedImageMime, data: uploadedImageBase64 };
+            }
+
+            renderBubbleDOM('user', msg, imageObj, null);
+
+            chatHistory.push({ role: 'user', content: msg, image: imageObj });
+            saveActiveHistoryToMemory();
+
+            isLoading = true;
+            document.getElementById('sendBtn').disabled = true;
+            showTyping();
+
+            const systemPrompt = SYSTEM_PROMPTS[version];
+            const model = MODELS[provider][version];
+
+            const processingImage = imageObj;
+            clearImageUpload();
+
+            try {
+                let reply = '';
+                if (provider === 'gemini') {
+                    reply = await callGemini(apiKey, model, systemPrompt);
+                } else if (provider === 'groq') {
+                    if (processingImage) {
+                        throw new Error('⚠️ Groq belum support input gambar. Gunakan Gemini untuk mengirim foto!');
+                    }
+                    reply = await callGroq(apiKey, model, systemPrompt);
+                }
+
+                removeTyping();
+                renderBubbleDOM('ai', reply, null, null);
+                chatHistory.push({ role: 'assistant', content: reply });
+                saveActiveHistoryToMemory();
+            } catch (err) {
+                removeTyping();
+                const errorMsg = err.message || 'Terjadi kesalahan. Coba lagi!';
+                renderBubbleDOM('ai', '❌ ' + errorMsg, null, null);
+            } finally {
+                isLoading = false;
+                document.getElementById('sendBtn').disabled = false;
+            }
         }
-        return 'Maaf, Aira tidak menerima respon balik dari server.';
-    }
-</script>
+
+        // ==================== API CALLS ====================
+        function getTruncatedHistory() {
+            // Token limit safeguard: ambil hanya last 15 messages
+            const start = Math.max(0, chatHistory.length - CONFIG.MAX_HISTORY_MESSAGES);
+            return chatHistory.slice(start);
+        }
+
+        async function callGemini(apiKey, model, systemPrompt) {
+            const truncated = getTruncatedHistory();
+            const contents = truncated.map(function (m) {
+                let parts = [];
+                if (m.image) {
+                    parts.push({
+                        inline_data: {
+                            mime_type: m.image.mime,
+                            data: m.image.data
+                        }
+                    });
+                }
+                parts.push({ text: m.content || '' });
+                return {
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: parts
+                };
+            });
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+
+            try {
+                const res = await fetch(
+                    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            system_instruction: { parts: [{ text: systemPrompt }] },
+                            contents: contents
+                        }),
+                        signal: controller.signal
+                    }
+                );
+
+                clearTimeout(timeoutId);
+
+                const contentType = res.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('API mengirimkan respons tidak valid. Periksa API Key Anda.');
+                }
+
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error((data.error && data.error.message) || 'Error: ' + res.status);
+                }
+
+                if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    return data.candidates[0].content.parts[0].text;
+                }
+                return 'Maaf, Aira tidak menerima respon balik dari server.';
+            } catch (err) {
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') {
+                    throw new Error('Waktu tunggu habis. Server tidak merespons dalam 30 detik.');
+                }
+                throw err;
+            }
+        }
+
+        async function callGroq(apiKey, model, systemPrompt) {
+            const truncated = getTruncatedHistory();
+            const textOnlyHistory = truncated.map(function (m) {
+                return { role: m.role, content: m.content };
+            });
+
+            const messages = [
+                { role: 'system', content: systemPrompt }
+            ].concat(textOnlyHistory);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messages,
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const contentType = res.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Groq API mengirimkan respons tidak valid. Status: ' + res.status);
+                }
+
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error((data.error && data.error.message) || 'Groq error ' + res.status);
+                }
+
+                if (data && data.choices && data.choices[0] && data.choices[0].message) {
+                    return data.choices[0].message.content;
+                }
+                return 'Maaf, Aira tidak menerima respon balik dari server.';
+            } catch (err) {
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') {
+                    throw new Error('Waktu tunggu habis. Server Groq tidak merespons dalam 30 detik.');
+                }
+                throw err;
+            }
+        }
+    </script>
 </body>
 </html>
