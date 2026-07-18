@@ -12,12 +12,10 @@
             --violet: #8b5cf6;
             --pink: #ec4899;
             --blue: #3b82f6;
-            --amber: #f59e0b;
             --cyan: #06b6d4;
-            --red: #ef4444;
             --green: #34d399;
+            --red: #ef4444;
             --bg: #0a0a12;
-            --surface: #1a1a2e;
         }
 
         * {
@@ -33,18 +31,167 @@
             color: #fff;
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow: hidden;
         }
 
         body {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         button {
             touch-action: manipulation;
             font-family: inherit;
             cursor: pointer;
+        }
+
+        /* ==================== SPLASH SCREEN ==================== */
+        .splash-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            overflow: hidden;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .splash-container.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(-45deg, #8b5cf6, #ec4899, #3b82f6, #06b6d4);
+            background-size: 400% 400%;
+            filter: blur(100px);
+            opacity: 0.6;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .splash-blur {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 18, 0.4);
+            backdrop-filter: blur(80px);
+            animation: blurFadeIn 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes blurFadeIn {
+            from { 
+                backdrop-filter: blur(100px);
+                background: rgba(10, 10, 18, 0.6);
+            }
+            to { 
+                backdrop-filter: blur(80px);
+                background: rgba(10, 10, 18, 0.4);
+            }
+        }
+
+        .splash-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            animation: contentFadeIn 1.2s ease-out 0.3s both;
+        }
+
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .splash-text {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(24px, 6vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+
+        .text-line {
+            display: block;
+        }
+
+        .text-line:first-child {
+            background: linear-gradient(90deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .text-line:last-child {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientText 3s ease infinite;
+        }
+
+        @keyframes gradientText {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+        }
+
+        .splash-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 16px;
+            animation: subtitleFade 1.5s ease-out 0.8s both;
+        }
+
+        @keyframes subtitleFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ==================== MAIN APP ==================== */
+        .app-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .app-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Background with animated gradient */
+        .app-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(-45deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1), rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1));
+            background-size: 400% 400%;
+            animation: bgGradient 15s ease infinite;
+            z-index: 0;
+        }
+
+        @keyframes bgGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* ==================== HEADER ==================== */
@@ -81,6 +228,23 @@
             padding: 0;
             cursor: pointer;
             touch-action: manipulation;
+            animation: jellyHover 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes jellyHover {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .menu-btn:active {
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes jellyPress {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
         }
 
         .menu-btn .bar {
@@ -161,12 +325,12 @@
             color: #fff;
             font-size: 13px;
             font-weight: 600;
-            transition: opacity 0.2s ease;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .menu-inner button:hover {
-            opacity: 0.9;
+        .menu-inner button:active {
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .menu-divider {
@@ -219,7 +383,7 @@
             font-family: 'Sora', sans-serif;
             font-size: clamp(16px, 4vw, 20px);
             font-weight: 700;
-            background: linear-gradient(90deg, var(--pink), var(--amber));
+            background: linear-gradient(90deg, var(--pink), var(--violet));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -246,8 +410,7 @@
         }
 
         .icon-btn:active {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .history-container {
@@ -302,7 +465,7 @@
         }
 
         .history-item:active {
-            background: rgba(255, 255, 255, 0.08);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .history-item.active {
@@ -331,7 +494,7 @@
         }
 
         .history-del:active {
-            background: rgba(239, 68, 68, 0.3);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .no-history {
@@ -341,7 +504,7 @@
             font-size: 13px;
         }
 
-        /* ==================== MAIN CHAT AREA ==================== */
+        /* ==================== CHAT AREA ==================== */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -352,6 +515,8 @@
             gap: 12px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 1;
         }
 
         .chat-area::-webkit-scrollbar {
@@ -377,7 +542,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 28px;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--pink), var(--amber));
+            background: linear-gradient(90deg, var(--pink), var(--violet));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -393,13 +558,19 @@
         .msg-row {
             display: flex;
             gap: 8px;
-            animation: slideIn 0.3s ease;
+            animation: messageSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             margin-bottom: 4px;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .msg-row.user {
@@ -432,6 +603,18 @@
             flex-direction: column;
             gap: 8px;
             overflow-x: hidden;
+            animation: bubblePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes bubblePop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .bubble.ai {
@@ -458,6 +641,7 @@
             display: flex;
             gap: 8px;
             margin-bottom: 4px;
+            animation: messageSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .typing {
@@ -558,7 +742,7 @@
         }
 
         .plus-btn:active {
-            transform: scale(0.95);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .action-menu {
@@ -598,7 +782,7 @@
         }
 
         .action-menu div:active {
-            background: rgba(255, 255, 255, 0.08);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         #msgInput {
@@ -645,7 +829,7 @@
         }
 
         .send-btn:active:not(:disabled) {
-            transform: scale(0.95);
+            animation: jellyPress 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .send-btn:disabled {
@@ -711,88 +895,106 @@
     </style>
 </head>
 <body>
-    <!-- Menu Backdrop -->
-    <div class="menu-backdrop" id="menuBackdrop" onclick="closeAllMenus()"></div>
-
-    <!-- HEADER -->
-    <header>
-        <div class="menu-container">
-            <button class="menu-btn" onclick="toggleMenu()" title="Pengaturan AI">
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-            <div class="menu-dropdown" id="menuDropdown">
-                <div class="menu-section">Pilih AI & Versi</div>
-                <div class="menu-inner">
-                    <select id="aiProvider" onchange="onProviderChange()">
-                        <option value="gemini">🔷 Gemini</option>
-                        <option value="groq">⚡ Groq</option>
-                    </select>
-
-                    <select id="modelVersion" onchange="saveVersion()">
-                        <option value="fast">⚡ Cepat — respons kilat</option>
-                        <option value="deep">🧠 Mendalam — analisis detail</option>
-                        <option value="task">📝 Tugas — bantu PR & pekerjaan</option>
-                    </select>
-                </div>
-
-                <div class="menu-divider"></div>
-
-                <div class="menu-section">API Key</div>
-                <div class="menu-inner">
-                    <input type="password" id="apiKeyInput" placeholder="Masukkan API key...">
-                    <button onclick="saveApiKey()">Simpan</button>
-                    <div class="api-badge" id="apiBadge"></div>
-                    <div class="api-warning">⚠️ Key disimpan lokal di browser Anda</div>
-                </div>
+    <!-- SPLASH SCREEN -->
+    <div class="splash-container" id="splashContainer">
+        <div class="splash-bg"></div>
+        <div class="splash-blur"></div>
+        <div class="splash-content">
+            <div class="splash-text">
+                <span class="text-line">Halo, Selamat</span>
+                <span class="text-line">Datang di Aira AI</span>
             </div>
-        </div>
-
-        <div class="header-title">
-            <h1>Aira AI</h1>
-        </div>
-
-        <div class="header-actions">
-            <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">➕ Baru</button>
-
-            <div class="history-container">
-                <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">📋 Riwayat</button>
-                <div class="history-dropdown" id="historyDropdown">
-                    <div class="menu-section">Riwayat Chat</div>
-                    <div class="history-list" id="historyList"></div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- CHAT AREA -->
-    <div class="chat-area" id="chatArea">
-        <div class="welcome">
-            <h3>Aira AI</h3>
-            <p>Ketuk menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
+            <div class="splash-subtitle">Tekan layar untuk mulai</div>
         </div>
     </div>
 
-    <!-- INPUT AREA -->
-    <div class="input-container">
-        <div class="preview-area" id="previewArea">
-            <img src="" id="imgPreviewTarget" alt="Upload Preview">
-            <button class="preview-close" onclick="clearImageUpload()">✕</button>
-        </div>
+    <!-- MAIN APP -->
+    <div class="app-container" id="appContainer">
+        <div class="app-bg"></div>
 
-        <div class="input-area">
-            <div class="action-wrapper">
-                <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
-                <div class="action-menu" id="actionMenu">
-                    <div onclick="triggerImageFile()">📸 Kirim Foto</div>
-                    <div onclick="triggerTextToPhoto()">🎨 Buat Foto</div>
+        <!-- Menu Backdrop -->
+        <div class="menu-backdrop" id="menuBackdrop" onclick="closeAllMenus()"></div>
+
+        <!-- HEADER -->
+        <header>
+            <div class="menu-container">
+                <button class="menu-btn" onclick="toggleMenu()" title="Pengaturan AI">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <div class="menu-dropdown" id="menuDropdown">
+                    <div class="menu-section">Pilih AI & Versi</div>
+                    <div class="menu-inner">
+                        <select id="aiProvider" onchange="onProviderChange()">
+                            <option value="gemini">Gemini</option>
+                            <option value="groq">Groq</option>
+                        </select>
+
+                        <select id="modelVersion" onchange="saveVersion()">
+                            <option value="fast">Cepat - Respons Kilat</option>
+                            <option value="deep">Mendalam - Analisis Detail</option>
+                            <option value="task">Tugas - Bantu PR & Pekerjaan</option>
+                        </select>
+                    </div>
+
+                    <div class="menu-divider"></div>
+
+                    <div class="menu-section">API Key</div>
+                    <div class="menu-inner">
+                        <input type="password" id="apiKeyInput" placeholder="Masukkan API key...">
+                        <button onclick="saveApiKey()">Simpan</button>
+                        <div class="api-badge" id="apiBadge"></div>
+                        <div class="api-warning">Key disimpan lokal di browser Anda</div>
+                    </div>
                 </div>
             </div>
 
-            <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="onFileSelected(this)">
+            <div class="header-title">
+                <h1>Aira AI</h1>
+            </div>
 
-            <textarea id="msgInput" placeholder="Ketik pesan..." rows="1" oninput="autoResize(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="newChat()" title="Percakapan Baru">Baru</button>
+
+                <div class="history-container">
+                    <button class="icon-btn" onclick="toggleHistory()" title="Riwayat Sesi">Riwayat</button>
+                    <div class="history-dropdown" id="historyDropdown">
+                        <div class="menu-section">Riwayat Chat</div>
+                        <div class="history-list" id="historyList"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CHAT AREA -->
+        <div class="chat-area" id="chatArea">
+            <div class="welcome">
+                <h3>Aira AI</h3>
+                <p>Buka menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
+            </div>
+        </div>
+
+        <!-- INPUT AREA -->
+        <div class="input-container">
+            <div class="preview-area" id="previewArea">
+                <img src="" id="imgPreviewTarget" alt="Upload Preview">
+                <button class="preview-close" onclick="clearImageUpload()">x</button>
+            </div>
+
+            <div class="input-area">
+                <div class="action-wrapper">
+                    <button class="plus-btn" onclick="toggleActionMenu(event)">+</button>
+                    <div class="action-menu" id="actionMenu">
+                        <div onclick="triggerImageFile()">Kirim Foto</div>
+                        <div onclick="triggerTextToPhoto()">Buat Foto</div>
+                    </div>
+                </div>
+
+                <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="onFileSelected(this)">
+
+                <textarea id="msgInput" placeholder="Ketik pesan..." rows="1" oninput="autoResize(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">></button>
+            </div>
         </div>
     </div>
 
@@ -802,7 +1004,8 @@
             MAX_FILE_SIZE: 5 * 1024 * 1024,
             ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
             MAX_HISTORY_MESSAGES: 15,
-            API_TIMEOUT: 30000
+            API_TIMEOUT: 30000,
+            SPLASH_DURATION: 4000
         };
 
         const MODELS = {
@@ -857,6 +1060,24 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 3. REKOMENDASI: Berikan tips tambahan agar hasil kerja semakin sempurna.`
         };
 
+        // ==================== SPLASH SCREEN ==================== */
+        function enterApp() {
+            const splash = document.getElementById('splashContainer');
+            const app = document.getElementById('appContainer');
+            
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                app.classList.add('show');
+            }, 100);
+        }
+
+        const splashAutoTimer = setTimeout(enterApp, CONFIG.SPLASH_DURATION);
+        document.getElementById('splashContainer').addEventListener('click', function(e) {
+            if (!e.target.closest('.splash-content')) return;
+            clearTimeout(splashAutoTimer);
+            enterApp();
+        });
+
         // ==================== STATE ====================
         let chatHistory = [];
         let isLoading = false;
@@ -874,7 +1095,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
         if (savedKey) {
             document.getElementById('apiKeyInput').value = savedKey;
-            showBadge(true, getProviderName(savedProvider) + ' aktif');
+            showBadge(true, 'Active');
         }
 
         if (!currentSessionId || !getSessionById(currentSessionId)) {
@@ -953,7 +1174,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             const key = localStorage.getItem('aira_key_' + p) || '';
             document.getElementById('apiKeyInput').value = key;
             localStorage.setItem('aira_provider', p);
-            if (key) showBadge(true, getProviderName(p) + ' aktif');
+            if (key) showBadge(true, 'Active');
             else hideBadge();
         }
 
@@ -961,20 +1182,16 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             localStorage.setItem('aira_version', document.getElementById('modelVersion').value);
         }
 
-        function getProviderName(p) {
-            return { gemini: '🔷 Gemini', groq: '⚡ Groq' }[p] || p;
-        }
-
         function saveApiKey() {
             const provider = document.getElementById('aiProvider').value;
             const key = document.getElementById('apiKeyInput').value.trim();
             if (!key) {
-                showBadge(false, 'API key kosong!');
+                showBadge(false, 'Empty');
                 return;
             }
             localStorage.setItem('aira_provider', provider);
             localStorage.setItem('aira_key_' + provider, key);
-            showBadge(true, getProviderName(provider) + ' tersimpan!');
+            showBadge(true, 'Saved');
             setTimeout(function () {
                 closeAllMenus();
             }, 1000);
@@ -1002,7 +1219,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
         function createNewSession() {
             currentSessionId = 'sess_' + Date.now();
             localStorage.setItem('aira_active_session', currentSessionId);
-            const newSess = { id: currentSessionId, title: 'Percakapan Baru', history: [] };
+            const newSess = { id: currentSessionId, title: 'Chat Baru', history: [] };
             sessions.unshift(newSess);
             localStorage.setItem('aira_sessions', JSON.stringify(sessions));
             chatHistory = [];
@@ -1060,7 +1277,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             const sess = getSessionById(currentSessionId);
             if (sess) {
                 sess.history = chatHistory;
-                if (chatHistory.length > 0 && sess.title === 'Percakapan Baru') {
+                if (chatHistory.length > 0 && sess.title === 'Chat Baru') {
                     let firstUserText = '';
                     for (let i = 0; i < chatHistory.length; i++) {
                         if (chatHistory[i].role === 'user') {
@@ -1068,8 +1285,8 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
                             break;
                         }
                     }
-                    if (!firstUserText) firstUserText = 'Kirim / Buat Foto';
-                    sess.title = firstUserText.substring(0, 22) + (firstUserText.length > 22 ? '...' : '');
+                    if (!firstUserText) firstUserText = 'Chat';
+                    sess.title = firstUserText.substring(0, 20) + (firstUserText.length > 20 ? '...' : '');
                 }
                 localStorage.setItem('aira_sessions', JSON.stringify(sessions));
                 renderHistoryList();
@@ -1081,7 +1298,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             if (!listEl) return;
             listEl.innerHTML = '';
             if (sessions.length === 0) {
-                listEl.innerHTML = '<div class="no-history">Tidak ada riwayat chat</div>';
+                listEl.innerHTML = '<div class="no-history">Tidak ada riwayat</div>';
                 return;
             }
             for (let i = 0; i < sessions.length; i++) {
@@ -1109,7 +1326,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             document.getElementById('chatArea').innerHTML = `
                 <div class="welcome">
                     <h3>Aira AI</h3>
-                    <p>Ketuk menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
+                    <p>Buka menu di pojok kiri atas untuk pilih AI, versi, dan masukkan API key!</p>
                 </div>`;
         }
 
@@ -1129,20 +1346,20 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             if (!file) return;
 
             if (file.size > CONFIG.MAX_FILE_SIZE) {
-                alert('❌ Ukuran foto maksimal 5MB!');
+                alert('Ukuran foto maksimal 5MB');
                 input.value = '';
                 return;
             }
 
             if (!CONFIG.ALLOWED_MIME_TYPES.includes(file.type)) {
-                alert('❌ Hanya JPG, PNG, WebP, GIF yang didukung!');
+                alert('Hanya JPG, PNG, WebP, GIF yang didukung');
                 input.value = '';
                 return;
             }
 
             const reader = new FileReader();
             reader.onerror = function () {
-                alert('❌ Gagal membaca file!');
+                alert('Gagal membaca file');
                 input.value = '';
             };
             reader.onload = function (e) {
@@ -1165,14 +1382,14 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
         function triggerTextToPhoto() {
             document.getElementById('actionMenu').classList.remove('show');
-            const promptText = prompt('Masukkan deskripsi foto (prompt) yang ingin dihasilkan:');
+            const promptText = prompt('Deskripsi foto yang ingin dihasilkan:');
             if (!promptText || !promptText.trim()) return;
 
             const chatArea = document.getElementById('chatArea');
             const welcome = chatArea.querySelector('.welcome');
             if (welcome) welcome.remove();
 
-            const displayPrompt = '🎨 Hasilkan foto: ' + promptText;
+            const displayPrompt = 'Hasilkan foto: ' + promptText;
             renderBubbleDOM('user', displayPrompt, null, null);
 
             chatHistory.push({ role: 'user', content: displayPrompt });
@@ -1184,11 +1401,11 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
             setTimeout(function () {
                 removeTyping();
-                renderBubbleDOM('ai', 'Berikut adalah foto hasil kreativitas Aira untuk Anda:', null, generatedUrl);
+                renderBubbleDOM('ai', 'Berikut adalah foto hasil kreativitas:', null, generatedUrl);
 
                 chatHistory.push({
                     role: 'assistant',
-                    content: 'Berikut adalah foto hasil kreativitas Aira untuk Anda:',
+                    content: 'Berikut adalah foto hasil kreativitas:',
                     generatedPhotoUrl: generatedUrl
                 });
                 saveActiveHistoryToMemory();
@@ -1272,7 +1489,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
             if (!apiKey) {
                 document.getElementById('menuDropdown').classList.add('show');
                 document.getElementById('menuBackdrop').classList.add('show');
-                alert('⚠️ Silakan masukkan API key terlebih dahulu!');
+                alert('Masukkan API key terlebih dahulu');
                 return;
             }
 
@@ -1310,7 +1527,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
                     reply = await callGemini(apiKey, model, systemPrompt);
                 } else if (provider === 'groq') {
                     if (processingImage) {
-                        throw new Error('⚠️ Groq belum support input gambar. Gunakan Gemini untuk mengirim foto!');
+                        throw new Error('Groq belum support input gambar. Gunakan Gemini');
                     }
                     reply = await callGroq(apiKey, model, systemPrompt);
                 }
@@ -1321,8 +1538,8 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
                 saveActiveHistoryToMemory();
             } catch (err) {
                 removeTyping();
-                const errorMsg = err.message || 'Terjadi kesalahan. Coba lagi!';
-                renderBubbleDOM('ai', '❌ ' + errorMsg, null, null);
+                const errorMsg = err.message || 'Terjadi kesalahan';
+                renderBubbleDOM('ai', 'Error: ' + errorMsg, null, null);
             } finally {
                 isLoading = false;
                 document.getElementById('sendBtn').disabled = false;
@@ -1375,7 +1592,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
                 const contentType = res.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('API mengirimkan respons tidak valid. Periksa API Key Anda.');
+                    throw new Error('API response invalid');
                 }
 
                 const data = await res.json();
@@ -1386,11 +1603,11 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
                 if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
                     return data.candidates[0].content.parts[0].text;
                 }
-                return 'Maaf, Aira tidak menerima respon balik dari server.';
+                return 'Tidak ada respon dari server';
             } catch (err) {
                 clearTimeout(timeoutId);
                 if (err.name === 'AbortError') {
-                    throw new Error('Waktu tunggu habis. Server tidak merespons dalam 30 detik.');
+                    throw new Error('Server timeout (30s)');
                 }
                 throw err;
             }
@@ -1429,7 +1646,7 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
 
                 const contentType = res.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Groq API mengirimkan respons tidak valid. Status: ' + res.status);
+                    throw new Error('Groq response invalid');
                 }
 
                 const data = await res.json();
@@ -1440,11 +1657,11 @@ Kamu menggunakan bahasa gaul formal yang profesional, taktis, solutif, berenergi
                 if (data && data.choices && data.choices[0] && data.choices[0].message) {
                     return data.choices[0].message.content;
                 }
-                return 'Maaf, Aira tidak menerima respon balik dari server.';
+                return 'Tidak ada respon dari server';
             } catch (err) {
                 clearTimeout(timeoutId);
                 if (err.name === 'AbortError') {
-                    throw new Error('Waktu tunggu habis. Server Groq tidak merespons dalam 30 detik.');
+                    throw new Error('Server timeout (30s)');
                 }
                 throw err;
             }
