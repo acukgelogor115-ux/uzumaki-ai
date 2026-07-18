@@ -1,1 +1,952 @@
-(very long file content omitted for brevity)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aira AI - Advanced Chat Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .new-chat-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .chat-item {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+        
+        .chat-item .delete-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .chat-item:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+        
+        .settings-panel label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 12px;
+            color: #aaa;
+        }
+        
+        .settings-panel input,
+        .settings-panel select {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .settings-panel input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .settings-panel input:focus,
+        .settings-panel select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* ===== MAIN CHAT AREA ===== */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header-meta {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .settings-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+            transition: opacity 0.2s;
+        }
+        
+        .settings-btn:hover {
+            opacity: 0.7;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .message.bot .message-content {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .message.bot .message-avatar {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        .loading {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            animation: bounce 1.4s infinite;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(1); opacity: 0.5; }
+            40% { transform: scale(1.3); opacity: 1; }
+        }
+        
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .input-field {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            max-height: 120px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .modal-content label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+        
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        .modal-content input:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+        
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .modal-buttons .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .modal-buttons .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .modal-buttons .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+        
+        .modal-buttons .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">✨ Aira AI</div>
+            <button class="new-chat-btn" onclick="createNewChat()">+ New Chat</button>
+            <div class="chat-history" id="chatHistory"></div>
+            
+            <div class="settings-panel">
+                <label>🔑 Gemini API Key</label>
+                <input type="password" id="geminiKey" placeholder="Enter Gemini API key">
+                
+                <label>🔑 Groq API Key</label>
+                <input type="password" id="groqKey" placeholder="Enter Groq API key">
+                
+                <label>🤖 Default Provider</label>
+                <select id="defaultProvider">
+                    <option value="gemini">Gemini</option>
+                    <option value="groq">Groq</option>
+                </select>
+                
+                <label style="margin-top: 15px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                    <input type="checkbox" id="autoSave" checked style="width: auto; cursor: pointer;">
+                    Auto-save settings
+                </label>
+            </div>
+        </div>
+
+        <!-- MAIN CHAT AREA -->
+        <div class="chat-container">
+            <!-- HEADER -->
+            <div class="header">
+                <div>
+                    <div class="header-title">Aira AI Chat</div>
+                    <div class="header-meta" id="modelDisplay">Gemini - Latest</div>
+                </div>
+                <button class="settings-btn" onclick="openSettingsModal()">⚙️</button>
+            </div>
+
+            <!-- MESSAGES -->
+            <div class="messages" id="messagesContainer">
+                <div class="message bot">
+                    <div class="message-avatar">✨</div>
+                    <div class="message-content">
+                        Halo! Saya adalah <strong>Aira AI</strong>, asisten virtual Anda yang cerdas dan responsif. Saya dapat membantu Anda dengan berbagai tugas menggunakan Gemini atau Groq. Apa yang bisa saya bantu hari ini?
+                    </div>
+                </div>
+            </div>
+
+            <!-- INPUT -->
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea class="input-field" id="messageInput" placeholder="Ketik pesan Anda di sini..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>⚙️ Settings</h2>
+            
+            <label>🔑 Gemini API Key</label>
+            <input type="password" id="modalGeminiKey" placeholder="Enter your Gemini API key">
+            
+            <label>🔑 Groq API Key</label>
+            <input type="password" id="modalGroqKey" placeholder="Enter your Groq API key">
+            
+            <label>🤖 Default Provider</label>
+            <select id="modalProvider">
+                <option value="gemini">Gemini</option>
+                <option value="groq">Groq</option>
+            </select>
+            
+            <label>🧠 AI System Prompt</label>
+            <textarea id="modalSystemPrompt" placeholder="Customize AI behavior..." style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 13px; resize: vertical; height: 100px;"></textarea>
+            
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIG & STATE =====
+        const CONFIG = {
+            GEMINI_API: 'https://generativelanguage.googleapis.com/v1beta/models',
+            GROQ_API: 'https://api.groq.com/openai/v1/chat/completions',
+        };
+
+        const DEFAULT_SYSTEM_PROMPT = `Anda adalah Aira AI, asisten virtual yang cerdas, ramah, dan sangat membantu. Anda dirancang untuk memberikan jawaban yang akurat, informatif, dan relevan dalam Bahasa Indonesia. 
+
+Karakteristik Anda:
+- Selalu bersikap profesional namun hangat
+- Memberikan penjelasan yang jelas dan mudah dipahami
+- Siap membantu berbagai topik: coding, writing, analysis, brainstorming, dll
+- Dapat mengakses berbagai domain pengetahuan
+- Responsif terhadap feedback dan pertanyaan lanjutan
+- Honest tentang keterbatasan dan tidak tahu
+
+Gunakan format yang rapi, bullet points ketika diperlukan, dan selalu berikan konteks yang jelas.`;
+
+        let state = {
+            currentChatId: null,
+            chats: {},
+            settings: {
+                geminiKey: '',
+                groqKey: '',
+                defaultProvider: 'gemini',
+                systemPrompt: DEFAULT_SYSTEM_PROMPT,
+                autoSave: true
+            }
+        };
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            createNewChat();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            input.addEventListener('input', () => {
+                input.style.height = 'auto';
+                input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+            });
+
+            // Sidebar settings
+            document.getElementById('geminiKey').addEventListener('change', (e) => {
+                state.settings.geminiKey = e.target.value;
+                if (state.settings.autoSave) saveSettings();
+            });
+
+            document.getElementById('groqKey').addEventListener('change', (e) => {
+                state.settings.groqKey = e.target.value;
+                if (state.settings.autoSave) saveSettings();
+            });
+
+            document.getElementById('defaultProvider').addEventListener('change', (e) => {
+                state.settings.defaultProvider = e.target.value;
+                if (state.settings.autoSave) saveSettings();
+                updateModelDisplay();
+            });
+
+            document.getElementById('autoSave').addEventListener('change', (e) => {
+                state.settings.autoSave = e.target.checked;
+                saveSettings();
+            });
+        }
+
+        // ===== CHAT MANAGEMENT =====
+        function createNewChat() {
+            const chatId = Date.now().toString();
+            state.chats[chatId] = {
+                id: chatId,
+                title: 'New Chat',
+                messages: [],
+                createdAt: new Date().toLocaleString()
+            };
+            state.currentChatId = chatId;
+            updateChatHistory();
+            clearMessages();
+            saveSettings();
+        }
+
+        function deleteChat(chatId) {
+            if (confirm('Hapus chat ini?')) {
+                delete state.chats[chatId];
+                if (state.currentChatId === chatId) {
+                    const chatIds = Object.keys(state.chats);
+                    state.currentChatId = chatIds.length > 0 ? chatIds[0] : null;
+                    if (!state.currentChatId) createNewChat();
+                }
+                updateChatHistory();
+                loadChat(state.currentChatId);
+                saveSettings();
+            }
+        }
+
+        function selectChat(chatId) {
+            state.currentChatId = chatId;
+            updateChatHistory();
+            loadChat(chatId);
+        }
+
+        function loadChat(chatId) {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            
+            if (state.chats[chatId]) {
+                state.chats[chatId].messages.forEach(msg => {
+                    addMessageToUI(msg.content, msg.type, false);
+                });
+            }
+        }
+
+        function updateChatHistory() {
+            const historyContainer = document.getElementById('chatHistory');
+            historyContainer.innerHTML = '';
+            
+            Object.values(state.chats).forEach(chat => {
+                const chatEl = document.createElement('div');
+                chatEl.className = `chat-item ${chat.id === state.currentChatId ? 'active' : ''}`;
+                chatEl.innerHTML = `
+                    <span style="flex: 1; cursor: pointer;" onclick="selectChat('${chat.id}')">${chat.title}</span>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteChat('${chat.id}')">✕</button>
+                `;
+                historyContainer.appendChild(chatEl);
+            });
+        }
+
+        // ===== MESSAGE HANDLING =====
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Validate API keys
+            if (!state.settings.geminiKey && !state.settings.groqKey) {
+                alert('❌ Silakan masukkan API Key Gemini atau Groq di sidebar!');
+                return;
+            }
+            
+            const provider = state.settings.defaultProvider;
+            if (provider === 'gemini' && !state.settings.geminiKey) {
+                alert('❌ Gemini API Key tidak tersedia!');
+                return;
+            }
+            if (provider === 'groq' && !state.settings.groqKey) {
+                alert('❌ Groq API Key tidak tersedia!');
+                return;
+            }
+
+            input.value = '';
+            input.style.height = 'auto';
+            
+            addMessageToUI(message, 'user', true);
+            updateChatTitle(message);
+            
+            document.getElementById('sendBtn').disabled = true;
+            showLoadingIndicator();
+            
+            try {
+                const response = provider === 'gemini' 
+                    ? await callGeminiAPI(message)
+                    : await callGroqAPI(message);
+                
+                addMessageToUI(response, 'bot', true);
+            } catch (error) {
+                addMessageToUI(`❌ Error: ${error.message}`, 'bot', true);
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        function addMessageToUI(content, type, save = true) {
+            const container = document.getElementById('messagesContainer');
+            
+            // Remove loading indicator
+            const loading = container.querySelector('.message .loading');
+            if (loading) loading.parentElement.remove();
+            
+            const msgEl = document.createElement('div');
+            msgEl.className = `message ${type}`;
+            msgEl.innerHTML = `
+                <div class="message-avatar">${type === 'user' ? '👤' : '✨'}</div>
+                <div class="message-content">${escapeHtml(content)}</div>
+            `;
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            
+            if (save && state.chats[state.currentChatId]) {
+                state.chats[state.currentChatId].messages.push({
+                    type,
+                    content
+                });
+                saveSettings();
+            }
+        }
+
+        function showLoadingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'message bot';
+            loadingEl.innerHTML = `
+                <div class="message-avatar">✨</div>
+                <div class="loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            `;
+            container.appendChild(loadingEl);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="message bot">
+                    <div class="message-avatar">✨</div>
+                    <div class="message-content">
+                        Halo! Saya adalah <strong>Aira AI</strong>, asisten virtual Anda yang cerdas dan responsif. Bagaimana saya bisa membantu Anda?
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateChatTitle(message) {
+            if (state.chats[state.currentChatId]) {
+                if (state.chats[state.currentChatId].messages.length === 0) {
+                    const title = message.substring(0, 50) + (message.length > 50 ? '...' : '');
+                    state.chats[state.currentChatId].title = title;
+                    updateChatHistory();
+                }
+            }
+        }
+
+        // ===== API CALLS =====
+        async function callGeminiAPI(message) {
+            const messages = state.chats[state.currentChatId].messages || [];
+            
+            const response = await fetch(
+                `${CONFIG.GEMINI_API}/gemini-pro:generateContent?key=${state.settings.geminiKey}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                role: 'user',
+                                parts: [
+                                    { text: state.settings.systemPrompt },
+                                    ...messages.map(msg => ({
+                                        text: msg.content
+                                    })),
+                                    { text: message }
+                                ]
+                            }
+                        ],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 2048,
+                        }
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Gemini API Error');
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        async function callGroqAPI(message) {
+            const messages = state.chats[state.currentChatId].messages || [];
+            
+            const response = await fetch(CONFIG.GROQ_API, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${state.settings.groqKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: 'mixtral-8x7b-32768',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: state.settings.systemPrompt
+                        },
+                        ...messages.map(msg => ({
+                            role: msg.type === 'user' ? 'user' : 'assistant',
+                            content: msg.content
+                        })),
+                        {
+                            role: 'user',
+                            content: message
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 2048,
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Groq API Error');
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // ===== SETTINGS =====
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+            document.getElementById('modalGeminiKey').value = state.settings.geminiKey;
+            document.getElementById('modalGroqKey').value = state.settings.groqKey;
+            document.getElementById('modalProvider').value = state.settings.defaultProvider;
+            document.getElementById('modalSystemPrompt').value = state.settings.systemPrompt;
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveSettings() {
+            localStorage.setItem('airaAI_state', JSON.stringify(state));
+            
+            // Update sidebar inputs
+            document.getElementById('geminiKey').value = state.settings.geminiKey;
+            document.getElementById('groqKey').value = state.settings.groqKey;
+            document.getElementById('defaultProvider').value = state.settings.defaultProvider;
+            document.getElementById('autoSave').checked = state.settings.autoSave;
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('airaAI_state');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                state = { ...state, ...loaded };
+            }
+            
+            document.getElementById('geminiKey').value = state.settings.geminiKey;
+            document.getElementById('groqKey').value = state.settings.groqKey;
+            document.getElementById('defaultProvider').value = state.settings.defaultProvider;
+            document.getElementById('autoSave').checked = state.settings.autoSave;
+            
+            updateModelDisplay();
+        }
+
+        function updateModelDisplay() {
+            const provider = state.settings.defaultProvider;
+            const modelText = provider === 'gemini' ? 'Gemini - Latest' : 'Groq - Mixtral 8x7B';
+            document.getElementById('modelDisplay').textContent = modelText;
+        }
+
+        // ===== UTILITIES =====
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('settingsModal');
+            if (e.target === modal) {
+                closeSettingsModal();
+            }
+        });
+    </script>
+</body>
+</html>
